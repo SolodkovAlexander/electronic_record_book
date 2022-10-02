@@ -18,7 +18,8 @@ export interface IParamsApplicationDoRequest {
 }
 
 export interface IParamsGetTablesInfo {
-    system?: boolean
+    system?: boolean,
+    needColumnsInfo?: boolean
 }
 
 export class Application {
@@ -193,7 +194,7 @@ export class Application {
      * @param params Operation params (filter tables, ..).
      * @returns Tables info.
      */
-    private static async getTablesInfo(params: IParamsGetTablesInfo): Promise<any> {
+    private static async getTablesInfo(params: IParamsGetTablesInfo | any = {}): Promise<any> {
         let doRequestResult: any = await Application.doRequest({
             params: {
                 url: taskRequestUrls.developTableOperation,
@@ -208,7 +209,8 @@ export class Application {
         }
 
         //Parse params
-        const isSystemTable: boolean = !!params.system;
+        const isSystemTable: boolean = !!(params.system);
+        const needColumnsInfo: boolean = !!(params.needColumnsInfo);
 
         //Create tables info
         let result: any = [];
@@ -217,9 +219,13 @@ export class Application {
                 continue;
             }
 
-            result.push({
+            let tableInfo: any = {
                 name: fullTableInfo.name
-            });
+            };
+            if (needColumnsInfo) {
+                tableInfo.columns = fullTableInfo.columns;
+            }
+            result.push(tableInfo);
         }
 
         return result;
@@ -318,6 +324,67 @@ export class Application {
                 }
 
                 Application.log(`Application::createTables:Column ${tableColumnInfo.name} in table ${tableInfo.name} created`);
+            }
+        }
+
+        //Get all existing tables info
+        const allTablesInfo: any = await Application.getTablesInfo({
+            system: false,
+            needColumnsInfo: true
+        } as IParamsGetTablesInfo);
+        if (!allTablesInfo) {
+            Application.log(`Application::createTables:Get all tables info failed`, true);
+            return false;
+        }
+
+        //Create links between tables (specified columns with references)
+        for (let tableInfo of tablesInfo) {
+            if (!tableInfo.references) {
+                continue;
+            }
+
+            for (let tableReferenceInfo of tableInfo.references) {
+                //Find column id in other table
+                const relationIdentificationColumnId: string | undefined = (
+                    allTablesInfo.find((item: any) => item.name === tableReferenceInfo.toTableName)
+                        ?.columns.find((item: any) => item.name === tableReferenceInfo.fieldName)
+                        ?.columnId
+                );
+                if (!relationIdentificationColumnId) {
+                    Application.log(`Application::createTables:Create reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
+                    return false;
+                }
+
+                //Define request data params
+                let doRequestdataParams: any = Object.assign(
+                    {
+                        metaInfo: {
+                            relationIdentificationColumnId: relationIdentificationColumnId
+                        }
+                    },
+                    tableReferenceInfo
+                );
+                delete doRequestdataParams.fieldName;
+
+                //Do request
+                const doRequestResult: any = await Application.doRequest({
+                    params: {
+                        url: `${taskRequestUrls.developTableOperation}/${tableInfo.name}/columns/relation`,
+                        method: "post",
+                        headers: {
+                            "auth-key": requestSettings.developerInfo["auth-key"]
+                        }
+                    } as IRequestParams,
+                    dataParams: {
+                        data: doRequestdataParams
+                    }
+                } as IParamsApplicationDoRequest);
+                if (!doRequestResult || !doRequestResult.columnId) {
+                    Application.log(`Application::createTables:Create column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
+                    return false;
+                }
+
+                Application.log(`Application::createTables:Column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} created`);
             }
         }
 
