@@ -1,7 +1,10 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Application } from './Application';
-import { ApplicationView } from './ApplicationView';
+import { 
+    Application
+} from './Application';
+import { 
+    ApplicationView
+} from './ApplicationView';
 import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -16,5 +19,5 @@ root.render(<ApplicationView />);
  * Инициализирует приложение.
  */
 async function applicationInit(): Promise<void> {
-  await Application.init();
+    await Application.init();
 };
