@@ -6,19 +6,36 @@ import {
     taskRequestUrls
 } from "./Settings";
 
+/**
+ * HTTP-request params.
+ * Main properties: url, method etc.
+ */
 export interface IRequestParams {
+    /** HTTP-request's method. */
     method: string,
+    /** HTTP-request's url. */
     url?: string
 }
 
+/**
+ * Params for {@link Application.doRequest}.
+ */
 export interface IParamsApplicationDoRequest {
+    /** HTTP-request's params (url, method, headers, etc.). */
     params: IRequestParams,
+    /** HTTP-request's body. */
     dataParams?: any,
+    /** Need HTTP-request's response as result. */
     needResponse?: boolean
 }
 
+/**
+ * Params for {@link Application.getTablesInfo}.
+ */
 export interface IParamsGetTablesInfo {
+    /** Value of table's property `system` (for filter). */
     system?: boolean,
+    /** Need table's column info. */
     needColumnsInfo?: boolean
 }
 
@@ -61,7 +78,7 @@ export class Application {
         }
 
         //Fill tables content
-        if (!(await Application.saveTablesObjects(databaseSchemaContent))) {
+        if (!(await Application.createTablesObjects(databaseSchemaContent))) {
             return;
         }
 
@@ -392,23 +409,20 @@ export class Application {
     }
 
     /**
-     * Save objects in tables.
+     * Create new objects in tables.
      * @param tablesObjectsInfo Tables objects info.
-     * @returns Operation success/fail.
+     * @returns Operation result.
      */
-    public static async saveTablesObjects(tablesObjectsInfo: any): Promise<boolean> {
-        if (!tablesObjectsInfo) {
-            return false;
-        }
-
-        //Save objects to each table
+    public static async createTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects in each table
+        let result: any = {};
         for (let tableName in tablesObjectsInfo) {
             const doRequestResult: any = await Application.doRequest({
                 params: {
-                    url: `${taskRequestUrls.saveTablesObjects}/${tableName}`,
+                    url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
                     method: "post",
                     headers: {
-                        "auth-key": requestSettings.developerInfo["auth-key"]
+                        "user-token": Application.userToken
                     }
                 } as IRequestParams,
                 dataParams: {
@@ -416,13 +430,184 @@ export class Application {
                 }
             } as IParamsApplicationDoRequest);
             if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
-                Application.log(`Application::createTables:Save objects to ${tableName} failed`, true);
-                return false;
+                Application.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+                return null;
             }
 
-            Application.log(`Application::createTables:All objects to ${tableName} saved`);
+            Application.log(`Application::createTables:Create new objects in ${tableName} finished`);
+            result[tableName] = doRequestResult;
         }
 
+        return result;
+    }
+
+    /**
+     * Create new object in table.
+     * @param tableName Table name.
+     * @param tableObjectInfo Table object info.
+     * @returns Operation result (value of `objectId` column).
+     */
+    public static async createTableObject(
+        tableName: string,
+        tableObjectInfo: any
+    ): Promise<any | null> {
+        //Call method with many table objects
+        let params: any = {};
+        params[tableName] = [tableObjectInfo];
+        const createTablesObjectsResult: any | null = await Application.createTablesObjects(params);
+        if (!createTablesObjectsResult) {
+            return null;
+        }
+
+        return createTablesObjectsResult[tableName];
+    }
+
+    /**
+     * Delete objects in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
+    public static async deleteTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects to each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            if (tablesObjectsInfo[tableName].length === 0) {
+                continue;
+            }
+
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
+                    method: "delete",
+                    headers: {
+                        "user-token": Application.userToken
+                    },
+                    params: {
+                        where: tablesObjectsInfo[tableName]
+                    }
+                } as IRequestParams
+            } as IParamsApplicationDoRequest);
+
+            Application.log(`Application::deleteTablesObjects:From ${tableName} ${doRequestResult} objects deleted`);
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Delete objects in table by column `objectId` values.
+     * @param tableName Table name.
+     * @param objectIds Table objects column `objectId` values.
+     * @returns Operation result.
+     */
+    public static async deleteTablesObjectsByObjectId(
+        tableName: string,
+        objectIds: Array<string>
+    ): Promise<any> {
+        //Call base method with where clause
+        let params: any = {};
+        params[tableName] = `objectId IN ('${objectIds.join(`','`)}')`;
+        return await Application.deleteTablesObjects(params);
+    }
+
+    /**
+     * Delete object in table by column `objectId` values.
+     * @param tableName Table name.
+     * @param objectId Table object column `objectId` value.
+     * @returns Operation success/fail.
+     */
+    public static async deleteTableObjectByObjectId(
+        tableName: string,
+        objectId: string
+    ): Promise<boolean> {
+        //Call base method with where clause
+        let params: any = {};
+        params[tableName] = `objectId = '${objectId}'`;
+        return (await Application.deleteTablesObjects(params))[tableName] === 1;
+    }
+
+    /**
+     * Update objects in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
+    public static async updateTablesObjects(tablesObjectsInfo: any): Promise<any> {
+        //Update objects to each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            if (tablesObjectsInfo[tableName].length === 0) {
+                continue;
+            }
+
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
+                    method: "put",
+                    headers: {
+                        "user-token": Application.userToken
+                    },
+                    params: {
+                        where: tablesObjectsInfo[tableName].where
+                    }
+                } as IRequestParams,
+                dataParams: {
+                    data: tablesObjectsInfo[tableName].data
+                }
+            } as IParamsApplicationDoRequest);
+
+            Application.log(
+                `Application::updateTablesObjects:In ${tableName} ${doRequestResult} objects updated`,
+                true
+            );
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Update object in table by column `objectId` value.
+     * @param tableName Table name.
+     * @param tableObjectInfo Table object info.
+     * @param tableObjectInfo Table object info.
+     * @returns Operation success/fail.
+     */
+    public static async updateTableObjectByObjectId(
+        tableName: string,
+        objectId: string,
+        tableObjectInfo: any,
+        useMultipleUpdateMethod: boolean = false
+    ): Promise<boolean> {
+        //Call update multiple objects method with where clause
+        if (useMultipleUpdateMethod) {
+            let params: any = {};
+            params[tableName] = {
+                where: `objectId = '${objectId}'`,
+                data: tableObjectInfo
+            };
+            return (await Application.updateTablesObjects(params))[tableName] === 1;
+        }
+
+        //Update single object method
+        const doRequestResult: any = await Application.doRequest({
+            params: {
+                url: `${taskRequestUrls.updateTableObject}/${tableName}/${objectId}`,
+                method: "put",
+                headers: {
+                    "user-token": Application.userToken
+                }
+            } as IRequestParams,
+            dataParams: {
+                data: tableObjectInfo
+            }
+        } as IParamsApplicationDoRequest);
+        if (!doRequestResult || doRequestResult.objectId !== objectId) {
+            Application.log(`Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} failed`, true);
+            return false;
+        }
+
+        Application.log(`Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} finished`);
         return true;
     }
 }

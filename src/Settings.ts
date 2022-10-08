@@ -39,7 +39,8 @@ export const taskRequestUrls: any = {
     userLogin: `${requestSettings.userInfo.url}/api/users/login`,
     checkValidOfUserToken: `${requestSettings.userInfo.url}/api/users/isvalidusertoken`,
     developTableOperation: `${requestSettings.developerInfo.url}/console/data/tables`,
-    saveTablesObjects: `${requestSettings.userInfo.url}/api/data/bulk`
+    tableObjectOperation: `${requestSettings.userInfo.url}/api/data/bulk`,
+    updateTableObject: `${requestSettings.userInfo.url}/api/data`
 };
 
 /**
