@@ -1,23 +1,20 @@
 import ReactDOM from 'react-dom/client';
 import { 
-    Application
-} from './Application';
-import { 
     ApplicationView
 } from './ApplicationView';
 import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-//Инициализируем приложение
-applicationInit();
+//Initialize application
+initApp();
 
 //Отображаем GUI приложения
 root.render(<ApplicationView />);
 
 /**
- * Инициализирует приложение.
+ * Initialize application.
  */
-async function applicationInit(): Promise<void> {
-    await Application.init();
+async function initApp(): Promise<void> {
+    await App.init();
 };

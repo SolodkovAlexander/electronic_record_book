@@ -18,7 +18,7 @@ export interface IRequestParams {
 }
 
 /**
- * Params for {@link Application.doRequest}.
+ * Params for {@link this.doRequest}.
  */
 export interface IParamsApplicationDoRequest {
     /** HTTP-request's params (url, method, headers, etc.). */
@@ -30,7 +30,7 @@ export interface IParamsApplicationDoRequest {
 }
 
 /**
- * Params for {@link Application.getTablesInfo}.
+ * Params for {@link this.getTablesInfo}.
  */
 export interface IParamsGetTablesInfo {
     /** Value of table's property `system` (for filter). */
@@ -43,46 +43,46 @@ export class Application {
     /** 
      * Is application initialized.
      */
-    private static initilized: boolean = false;
+    private initilized: boolean = false;
     /**
      * User token for HTTP-requests.
-     * Updating by {@link Application.loginAsUser} with user info from {@link requestSettings}.
+     * Updating by {@link this.loginAsUser} with user info from {@link requestSettings}.
      */
-    private static userToken: string = "";
+    private userToken: string = "";
 
     /**
      * Initialize application.
      */
-    public static async init(): Promise<void> {
+    public async init(): Promise<void> {
         //If application isn't initilized: exit
-        if (Application.initilized) {
+        if (this.initilized) {
             return;
         }
 
         //Login user
-        if (!(await Application.loginAsUser())) {
+        if (!(await this.loginAsUser())) {
             return;
         }
 
         //Delete all existing not system tables
-        const tablesInfo: any = await Application.getTablesInfo({
+        const tablesInfo: any = await this.getTablesInfo({
             system: false
         });
-        if (!(await Application.deleteTables(tablesInfo))) {
+        if (!(await this.deleteTables(tablesInfo))) {
             return;
         }
 
         //Create new tables
-        if (!(await Application.createTables(databaseSchema.tables))) {
+        if (!(await this.createTables(databaseSchema.tables))) {
             return;
         }
 
         //Fill tables content
-        if (!(await Application.createTablesObjects(databaseSchemaContent))) {
+        if (!(await this.createTablesObjects(databaseSchemaContent))) {
             return;
         }
 
-        Application.initilized = true;
+        this.initilized = true;
     }
 
     /**
@@ -90,7 +90,7 @@ export class Application {
      * @param params Operation params (request params, data params).
      * @returns HTTP-request data or undefined.
      */
-    public static async doRequest(params: IParamsApplicationDoRequest): Promise<any> {
+    public async doRequest(params: IParamsApplicationDoRequest): Promise<any> {
         return await axios({
             ...params.params,
             ...params.dataParams
@@ -104,43 +104,15 @@ export class Application {
 
             return response.data;
         }).catch(() => {
-            Application.log(`Application::doRequest:Request finished with error ${JSON.stringify(params)}`, true);
+            Debug(`Application::doRequest:Request finished with error ${JSON.stringify(params)}`, true);
         });
-    }
-
-    /** 
-     * Add console log record.
-     * @param text Log text.
-     * @param isError Is error log.
-     */
-    public static log(
-        text: string,
-        isError: boolean = false
-    ): void {
-        //Get time
-        const t = new Date();
-        const date = ('0' + t.getDate()).slice(-2);
-        const month = ('0' + (t.getMonth() + 1)).slice(-2);
-        const year = t.getFullYear().toString().slice(-2);
-        const hours = ('0' + t.getHours()).slice(-2);
-        const minutes = ('0' + t.getMinutes()).slice(-2);
-        const seconds = ('0' + t.getSeconds()).slice(-2);
-        const milliseconds = ('0' + t.getMilliseconds()).slice(-3);
-        const time = `${date}.${month}.${year} ${hours}:${minutes}:${seconds}.${milliseconds}`;
-
-        //Log to console
-        if (isError) {
-            console.error(`${time} ${text}`);
-        } else {
-            console.log(`${time} ${text}`);
-        }
     }
 
     /**
      * Login user by user info from {@link requestSettings}.
      * @returns Operation success/fail.
      */
-    private static async loginAsUser(): Promise<boolean> {
+    private async loginAsUser(): Promise<boolean> {
         //Find cached user token
         let cachedUsersInfo: any = JSON.parse(localStorage.getItem("usersInfo") || "[]");
         for (let i = 0; i < cachedUsersInfo.length; ++i) {
@@ -149,8 +121,8 @@ export class Application {
             }
 
             //Check valid of cached user token
-            if (await Application.checkValidOfUserToken(cachedUsersInfo[i]["user-token"])) {
-                Application.userToken = cachedUsersInfo[i]["user-token"];
+            if (await this.checkValidOfUserToken(cachedUsersInfo[i]["user-token"])) {
+                this.userToken = cachedUsersInfo[i]["user-token"];
                 return true;
             }
 
@@ -161,7 +133,7 @@ export class Application {
         }
 
         //Login user (for get user token)
-        const doRequestResult: any = await Application.doRequest({
+        const doRequestResult: any = await this.doRequest({
             params: {
                 url: taskRequestUrls.userLogin,
                 method: "post"
@@ -175,12 +147,12 @@ export class Application {
         }
 
         //Check valid of user token
-        if (!(await Application.checkValidOfUserToken(doRequestResult["user-token"]))) {
+        if (!(await this.checkValidOfUserToken(doRequestResult["user-token"]))) {
             return false;
         }
 
         //Remember user token
-        Application.userToken = doRequestResult["user-token"];
+        this.userToken = doRequestResult["user-token"];
 
         //Update cached users info
         cachedUsersInfo.push({
@@ -197,8 +169,8 @@ export class Application {
      * @param userToken User token.
      * @returns Operation success/fail.
      */
-    private static async checkValidOfUserToken(userToken: string) {
-        return (await Application.doRequest({
+    private async checkValidOfUserToken(userToken: string) {
+        return (await this.doRequest({
             params: {
                 url: `${taskRequestUrls.checkValidOfUserToken}/${userToken}`,
                 method: "get"
@@ -211,8 +183,8 @@ export class Application {
      * @param params Operation params (filter tables, ..).
      * @returns Tables info.
      */
-    private static async getTablesInfo(params: IParamsGetTablesInfo | any = {}): Promise<any> {
-        let doRequestResult: any = await Application.doRequest({
+    private async getTablesInfo(params: IParamsGetTablesInfo | any = {}): Promise<any> {
+        let doRequestResult: any = await this.doRequest({
             params: {
                 url: taskRequestUrls.developTableOperation,
                 method: "get",
@@ -253,7 +225,7 @@ export class Application {
      * @param tablesInfo Tables info.
      * @returns Operation success/fail.
      */
-    private static async deleteTables(tablesInfo: any): Promise<boolean> {
+    private async deleteTables(tablesInfo: any): Promise<boolean> {
         if (!tablesInfo) {
             return false;
         }
@@ -263,7 +235,7 @@ export class Application {
 
         //Delete each table
         for (let tableInfo of tablesInfo) {
-            const doRequestResult: any = await Application.doRequest({
+            const doRequestResult: any = await this.doRequest({
                 params: {
                     url: `${taskRequestUrls.developTableOperation}/${tableInfo.name}`,
                     method: "delete",
@@ -274,11 +246,11 @@ export class Application {
                 needResponse: true
             } as IParamsApplicationDoRequest);
             if (!doRequestResult || doRequestResult.status !== 204) {
-                Application.log(`Application::deleteTables:Delete table ${tableInfo.name} failed`, true);
+                Debug(`Application::deleteTables:Delete table ${tableInfo.name} failed`, true);
                 return false;
             }
 
-            Application.log(`Application::deleteTables:Table ${tableInfo.name} deleted`);
+            Debug(`Application::deleteTables:Table ${tableInfo.name} deleted`);
         }
 
         return true;
@@ -289,14 +261,14 @@ export class Application {
      * @param tablesInfo Tables info.
      * @returns Operation success/fail.
      */
-    private static async createTables(tablesInfo: any): Promise<boolean> {
+    private async createTables(tablesInfo: any): Promise<boolean> {
         if (!tablesInfo) {
             return false;
         }
 
         //Create each table
         for (let tableInfo of tablesInfo) {
-            const doRequestResult: any = await Application.doRequest({
+            const doRequestResult: any = await this.doRequest({
                 params: {
                     url: taskRequestUrls.developTableOperation,
                     method: "post",
@@ -311,11 +283,11 @@ export class Application {
                 }
             } as IParamsApplicationDoRequest);
             if (!doRequestResult || !doRequestResult.tableId) {
-                Application.log(`Application::createTables:Create table ${tableInfo.name} failed`, true);
+                Debug(`Application::createTables:Create table ${tableInfo.name} failed`, true);
                 return false;
             }
 
-            Application.log(`Application::createTables:Table ${tableInfo.name} created`);
+            Debug(`Application::createTables:Table ${tableInfo.name} created`);
 
             //WTF IS GOING ON: creating table with columns with one query not work well:
             //all columns data types are UNKNOWN. So we create each column manually.
@@ -323,7 +295,7 @@ export class Application {
 
             //Create table columns
             for (let tableColumnInfo of tableInfo.columns) {
-                const doRequestResult: any = await Application.doRequest({
+                const doRequestResult: any = await this.doRequest({
                     params: {
                         url: `${taskRequestUrls.developTableOperation}/${tableInfo.name}/columns`,
                         method: "post",
@@ -336,21 +308,21 @@ export class Application {
                     }
                 } as IParamsApplicationDoRequest);
                 if (!doRequestResult || !doRequestResult.columnId) {
-                    Application.log(`Application::createTables:Create column ${tableColumnInfo.name} in table ${tableInfo.name} failed`, true);
+                    Debug(`Application::createTables:Create column ${tableColumnInfo.name} in table ${tableInfo.name} failed`, true);
                     return false;
                 }
 
-                Application.log(`Application::createTables:Column ${tableColumnInfo.name} in table ${tableInfo.name} created`);
+                Debug(`Application::createTables:Column ${tableColumnInfo.name} in table ${tableInfo.name} created`);
             }
         }
 
         //Get all existing tables info
-        const allTablesInfo: any = await Application.getTablesInfo({
+        const allTablesInfo: any = await this.getTablesInfo({
             system: false,
             needColumnsInfo: true
         } as IParamsGetTablesInfo);
         if (!allTablesInfo) {
-            Application.log(`Application::createTables:Get all tables info failed`, true);
+            Debug(`Application::createTables:Get all tables info failed`, true);
             return false;
         }
 
@@ -368,7 +340,7 @@ export class Application {
                         ?.columnId
                 );
                 if (!relationIdentificationColumnId) {
-                    Application.log(`Application::createTables:Create reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
+                    Debug(`Application::createTables:Create reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
                     return false;
                 }
 
@@ -384,7 +356,7 @@ export class Application {
                 delete doRequestdataParams.fieldName;
 
                 //Do request
-                const doRequestResult: any = await Application.doRequest({
+                const doRequestResult: any = await this.doRequest({
                     params: {
                         url: `${taskRequestUrls.developTableOperation}/${tableInfo.name}/columns/relation`,
                         method: "post",
@@ -397,11 +369,11 @@ export class Application {
                     }
                 } as IParamsApplicationDoRequest);
                 if (!doRequestResult || !doRequestResult.columnId) {
-                    Application.log(`Application::createTables:Create column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
+                    Debug(`Application::createTables:Create column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} failed`, true);
                     return false;
                 }
 
-                Application.log(`Application::createTables:Column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} created`);
+                Debug(`Application::createTables:Column with reference ${tableReferenceInfo.name} in table ${tableInfo.name} created`);
             }
         }
 
@@ -413,16 +385,16 @@ export class Application {
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.
      */
-    public static async createTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
+    public async createTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
         //Create new objects in each table
         let result: any = {};
         for (let tableName in tablesObjectsInfo) {
-            const doRequestResult: any = await Application.doRequest({
+            const doRequestResult: any = await this.doRequest({
                 params: {
                     url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
                     method: "post",
                     headers: {
-                        "user-token": Application.userToken
+                        "user-token": this.userToken
                     }
                 } as IRequestParams,
                 dataParams: {
@@ -430,11 +402,11 @@ export class Application {
                 }
             } as IParamsApplicationDoRequest);
             if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
-                Application.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+                Debug(`Application::createTables:Create new objects in ${tableName} failed`, true);
                 return null;
             }
 
-            Application.log(`Application::createTables:Create new objects in ${tableName} finished`);
+            Debug(`Application::createTables:Create new objects in ${tableName} finished`);
             result[tableName] = doRequestResult;
         }
 
@@ -447,14 +419,14 @@ export class Application {
      * @param tableObjectInfo Table object info.
      * @returns Operation result (value of `objectId` column).
      */
-    public static async createTableObject(
+    public async createTableObject(
         tableName: string,
         tableObjectInfo: any
     ): Promise<any | null> {
         //Call method with many table objects
         let params: any = {};
         params[tableName] = [tableObjectInfo];
-        const createTablesObjectsResult: any | null = await Application.createTablesObjects(params);
+        const createTablesObjectsResult: any | null = await this.createTablesObjects(params);
         if (!createTablesObjectsResult) {
             return null;
         }
@@ -467,7 +439,7 @@ export class Application {
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.
      */
-    public static async deleteTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
+    public async deleteTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
         //Create new objects to each table
         let result: any = {};
         for (let tableName in tablesObjectsInfo) {
@@ -475,12 +447,12 @@ export class Application {
                 continue;
             }
 
-            const doRequestResult: any = await Application.doRequest({
+            const doRequestResult: any = await this.doRequest({
                 params: {
                     url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
                     method: "delete",
                     headers: {
-                        "user-token": Application.userToken
+                        "user-token": this.userToken
                     },
                     params: {
                         where: tablesObjectsInfo[tableName]
@@ -488,7 +460,7 @@ export class Application {
                 } as IRequestParams
             } as IParamsApplicationDoRequest);
 
-            Application.log(`Application::deleteTablesObjects:From ${tableName} ${doRequestResult} objects deleted`);
+            Debug(`Application::deleteTablesObjects:From ${tableName} ${doRequestResult} objects deleted`);
             result[tableName] = doRequestResult;
         }
 
@@ -501,14 +473,14 @@ export class Application {
      * @param objectIds Table objects column `objectId` values.
      * @returns Operation result.
      */
-    public static async deleteTablesObjectsByObjectId(
+    public async deleteTablesObjectsByObjectId(
         tableName: string,
         objectIds: Array<string>
     ): Promise<any> {
         //Call base method with where clause
         let params: any = {};
         params[tableName] = `objectId IN ('${objectIds.join(`','`)}')`;
-        return await Application.deleteTablesObjects(params);
+        return await this.deleteTablesObjects(params);
     }
 
     /**
@@ -517,14 +489,14 @@ export class Application {
      * @param objectId Table object column `objectId` value.
      * @returns Operation success/fail.
      */
-    public static async deleteTableObjectByObjectId(
+    public async deleteTableObjectByObjectId(
         tableName: string,
         objectId: string
     ): Promise<boolean> {
         //Call base method with where clause
         let params: any = {};
         params[tableName] = `objectId = '${objectId}'`;
-        return (await Application.deleteTablesObjects(params))[tableName] === 1;
+        return (await this.deleteTablesObjects(params))[tableName] === 1;
     }
 
     /**
@@ -532,7 +504,7 @@ export class Application {
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.
      */
-    public static async updateTablesObjects(tablesObjectsInfo: any): Promise<any> {
+    public async updateTablesObjects(tablesObjectsInfo: any): Promise<any> {
         //Update objects to each table
         let result: any = {};
         for (let tableName in tablesObjectsInfo) {
@@ -540,12 +512,12 @@ export class Application {
                 continue;
             }
 
-            const doRequestResult: any = await Application.doRequest({
+            const doRequestResult: any = await this.doRequest({
                 params: {
                     url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
                     method: "put",
                     headers: {
-                        "user-token": Application.userToken
+                        "user-token": this.userToken
                     },
                     params: {
                         where: tablesObjectsInfo[tableName].where
@@ -556,7 +528,7 @@ export class Application {
                 }
             } as IParamsApplicationDoRequest);
 
-            Application.log(
+            Debug(
                 `Application::updateTablesObjects:In ${tableName} ${doRequestResult} objects updated`,
                 true
             );
@@ -573,7 +545,7 @@ export class Application {
      * @param tableObjectInfo Table object info.
      * @returns Operation success/fail.
      */
-    public static async updateTableObjectByObjectId(
+    public async updateTableObjectByObjectId(
         tableName: string,
         objectId: string,
         tableObjectInfo: any,
@@ -586,16 +558,16 @@ export class Application {
                 where: `objectId = '${objectId}'`,
                 data: tableObjectInfo
             };
-            return (await Application.updateTablesObjects(params))[tableName] === 1;
+            return (await this.updateTablesObjects(params))[tableName] === 1;
         }
 
         //Update single object method
-        const doRequestResult: any = await Application.doRequest({
+        const doRequestResult: any = await this.doRequest({
             params: {
                 url: `${taskRequestUrls.updateTableObject}/${tableName}/${objectId}`,
                 method: "put",
                 headers: {
-                    "user-token": Application.userToken
+                    "user-token": this.userToken
                 }
             } as IRequestParams,
             dataParams: {
@@ -603,11 +575,14 @@ export class Application {
             }
         } as IParamsApplicationDoRequest);
         if (!doRequestResult || doRequestResult.objectId !== objectId) {
-            Application.log(`Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} failed`, true);
+            Debug(
+                `Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} failed`,
+                true
+            );
             return false;
         }
 
-        Application.log(`Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} finished`);
+        Debug(`Application::updateTableObjectByObjectId:Update object ${objectId} in ${tableName} finished`);
         return true;
     }
 }
