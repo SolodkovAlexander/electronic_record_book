@@ -6,15 +6,15 @@ export const backendlessAppInfo: any = {
      * Part of Backendless subdomain.
      * Ex.: if subdomain = "readytemper", then Backendless subdomain = "readytemper.backendless.app".
      */
-    subdomain: "readytemper",
+    subdomain: "primosea",
     /**
      *  Application ID.
      */
-    applicationId: "1090BFF1-58C3-2AE3-FF28-3060ADA1B800",
+    applicationId: "66FA45F3-E53D-16C3-FFBE-FDF3F161CF00",
     /** 
      * REST API key.
      */
-    RESTApiKey: "9A6EAECE-0401-4C29-8BCD-AE0A5C9BDE14"
+    RESTApiKey: "5E37969E-D267-406F-AB19-2486635B82E7"
 };
 
 /**
@@ -23,9 +23,16 @@ export const backendlessAppInfo: any = {
 export const requestSettings: any = {
     developerInfo: {
         url: `https://develop.backendless.com/${backendlessAppInfo.applicationId}`,
-        "auth-key": "walyrjutystchlxqezkysnlxslntwjqzhcpy"
+        /** 
+         * You can find this on any HTTP-request with data on `Data` tab (ex. create table).
+         * The key may be expired?
+         */
+        "auth-key": "wwxnlntjitsgkyeerzqqcqoxdwojbrgtcumw"
     },
     userInfo: {
+        /** 
+         * Ypu can create user on `Data` tab on `System data` article.
+         */
         url: `https://${backendlessAppInfo.subdomain}.backendless.app`,
         login: "admspo@gmail.com",
         password: "12345678"
