@@ -6,7 +6,7 @@ export const backendlessAppInfo: any = {
      * Part of Backendless subdomain.
      * Ex.: if subdomain = "readytemper", then Backendless subdomain = "readytemper.backendless.app".
      */
-    subdomain: "primosea1",
+    subdomain: "primosea",
     /**
      *  Application ID.
      */
