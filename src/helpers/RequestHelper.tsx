@@ -8,7 +8,7 @@ import {
 } from "../Settings";
 
 import Professor from "../models/Professor";
-import { IParamsApplicationDoRequest, IRequestParams } from "../Application";
+import { Application, IParamsApplicationDoRequest, IRequestParams } from "../Application";
 
 export class RequestHelper {
   
@@ -88,4 +88,36 @@ export class RequestHelper {
 
     return doRequestResult;
   }
+//   /**
+//  * Create new objects in tables.
+//  * @param tablesObjectsInfo Tables objects info.
+//  * @returns Operation result.
+//  */
+//   public static async createTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
+//     //Create new objects in each table
+//     let result: any = {};
+//     for (let tableName in tablesObjectsInfo) {
+//       const doRequestResult: any = await RequestHelper.doRequest({
+//         params: {
+//           url: `${taskRequestUrls.tableObjectOperation}/${tableName}`,
+//           method: "post",
+//           headers: {
+//             "user-token": Application.userToken
+//           }
+//         } as IRequestParams,
+//         dataParams: {
+//           data: tablesObjectsInfo[tableName]
+//         }
+//       } as IParamsApplicationDoRequest);
+//       if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
+//         RequestHelper.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+//         return null;
+//       }
+
+//       RequestHelper.log(`Application::createTables:Create new objects in ${tableName} finished`);
+//       result[tableName] = doRequestResult;
+//     }
+
+//     return result;
+//   };
 };

@@ -5,7 +5,8 @@ import { ExampleNavBar } from './components/ExampleNavBar';
 import Professor from './models/Professor';
 import { GroupsPage } from './pages/GroupsPage';
 import LandingPage from './pages/LandingPage';
-import { ProfessorsPage } from './pages/ProfessorsPage';
+import ProfessorCreate from './pages/Professor/ProfessorCreate';
+import { ProfessorsPage } from './pages/Professor/ProfessorsPage';
 import { StudentsPage } from './pages/StudentsPage';
 // import { Link } from "react-router-dom";
 interface IProps {
@@ -32,6 +33,7 @@ class App extends React.Component<IProps, IState> {
             <Route path="/professors" element={<ProfessorsPage />} />
             <Route path="/students" element={<StudentsPage />} />
             <Route path="/student_group" element={<GroupsPage />} />
+            <Route path="/professor_create" element={<ProfessorCreate/>} />
           </Routes>        
         </Container>
       </BrowserRouter>
