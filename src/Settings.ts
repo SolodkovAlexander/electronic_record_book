@@ -6,15 +6,16 @@ export const backendlessAppInfo: any = {
      * Part of Backendless subdomain.
      * Ex.: if subdomain = "readytemper", then Backendless subdomain = "readytemper.backendless.app".
      */
-    subdomain: "readytemper",
+    // serverURL: "https://eu-api.backendless.com",
+    subdomain: "cuddlypear",
     /**
      *  Application ID.
      */
-    applicationId: "1090BFF1-58C3-2AE3-FF28-3060ADA1B800",
+    applicationId: "0DFA9DFB-2242-742A-FFE6-2864198CB900",
     /** 
      * REST API key.
      */
-    RESTApiKey: "9A6EAECE-0401-4C29-8BCD-AE0A5C9BDE14"
+    RESTApiKey: "0ACE48F2-A627-48E1-984F-CA554A6DC74C"
 };
 
 /**
@@ -22,13 +23,14 @@ export const backendlessAppInfo: any = {
  */
 export const requestSettings: any = {
     developerInfo: {
+        // serverURL: "https://eu-api.backendless.com",
         url: `https://develop.backendless.com/${backendlessAppInfo.applicationId}`,
-        "auth-key": "walyrjutystchlxqezkysnlxslntwjqzhcpy"
+        "auth-key": "liumhkaocvikfcigjfnvjkapugishxvhsjdv"
     },
     userInfo: {
         url: `https://${backendlessAppInfo.subdomain}.backendless.app`,
         login: "admspo@gmail.com",
-        password: "12345678"
+        password: "123456"
     }
 };
 
