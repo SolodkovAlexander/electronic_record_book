@@ -42,7 +42,8 @@ export const taskRequestUrls: any = {
     checkValidOfUserToken: `${requestSettings.userInfo.url}/api/users/isvalidusertoken`,
     developTableOperation: `${requestSettings.developerInfo.url}/console/data/tables`,
     tableObjectOperation: `${requestSettings.userInfo.url}/api/data/bulk`,
-    updateTableObject: `${requestSettings.userInfo.url}/api/data`
+    updateTableObject: `${requestSettings.userInfo.url}/api/data`,
+    getTableData: `${requestSettings.userInfo.url}/api/data` //just for test, yes, i know it's the same as previous row
 };
 
 /**
