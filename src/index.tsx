@@ -2,9 +2,10 @@ import ReactDOM from 'react-dom/client';
 import { 
     Application
 } from './Application';
-import { 
-    ApplicationView
-} from './ApplicationView';
+import App from './ApplicationView';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -13,7 +14,8 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 applicationInit();
 
 //Отображаем GUI приложения
-root.render(<ApplicationView />);
+// root.render(<ApplicationView />);
+root.render(<App/>);
 
 /**
  * Инициализирует приложение.

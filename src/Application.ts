@@ -84,9 +84,6 @@ export class Application {
         //     return;
         // }
 
-        // let result = Application.getTableData('Professor');
-        // console.log(result);
-
         Application.initilized = true;
     }
 

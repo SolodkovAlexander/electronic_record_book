@@ -1,51 +1,41 @@
-import React, { useEffect, useState } from 'react';
-
-import { 
-    AgGridReact 
-} from 'ag-grid-react';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-
-import {
-   Progress 
-} from 'antd';
-import 'antd/dist/antd.min.css'
-import { RequestHelper } from './helpers/RequestHelper';
-
+import * as React from 'react';
+import { Container } from 'react-bootstrap';
+import { MemoryRouter, Routes, Route, BrowserRouter } from 'react-router-dom';
+import { ExampleNavBar } from './components/ExampleNavBar';
 import Professor from './models/Professor';
+import { GroupsPage } from './pages/GroupsPage';
+import LandingPage from './pages/LandingPage';
+import { ProfessorsPage } from './pages/ProfessorsPage';
+import { StudentsPage } from './pages/StudentsPage';
+// import { Link } from "react-router-dom";
+interface IProps {
+}
+interface IState {
+}
 
-export const ApplicationView = () => { 
-    // useState for tracking data after render
-    const [rowData, setRowData] = useState();
+class App extends React.Component<IProps, IState> {
 
-    // useEffect to async call for data
-    useEffect(() => {
-        async function getProfessorAsync() {
-            const result = await RequestHelper.getTableData('Professor');;
-            setRowData(result);
-        }
-        getProfessorAsync();
-    }, []);
 
-    const [columnDefs] = useState(Professor.describe());
-    const [applicationInitializeProgress] = useState(10);
+  public componentDidMount() {
 
-    return (  
-    <div 
-        className="ag-theme-alpine"
-        style={{height: 300, width: 800}}>
-            <Progress
-                strokeColor={{
-                    from: '#108ee9',
-                    to: '#87d068',
-                }}
-                percent={applicationInitializeProgress}
-                status="active"
-            />
-            <AgGridReact 
-                rowData={rowData} 
-                columnDefs={columnDefs}>
-            </AgGridReact>
-    </div>
+  }
+
+  public render(): React.ReactNode {
+    return (
+      
+      <BrowserRouter>
+        <ExampleNavBar />
+        <Container>
+          {/* in react-route-dom v6 there is no Swoitch (like v5), now it's Routes */}
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/professors" element={<ProfessorsPage />} />
+            <Route path="/students" element={<StudentsPage />} />
+            <Route path="/student_group" element={<GroupsPage />} />
+          </Routes>        
+        </Container>
+      </BrowserRouter>
     );
-};
+  }
+}
+export default App;
