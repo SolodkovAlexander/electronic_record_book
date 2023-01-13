@@ -138,6 +138,18 @@ export const databaseSchema: any = {
                     "dataType": "STRING",
                     "defaultValue": ""
                 }
+            ],
+            references: [
+                {
+                    "name": "curator",
+                    "dataType": "DATA_REF",
+                    "required": false,
+                    "indexed": false,
+                    "defaultValue": null,
+                    "relationshipType": "ONE_TO_ONE",
+                    "toTableName": "professor",
+                    fieldName: "objectId"
+                }
             ]
         }
     ]

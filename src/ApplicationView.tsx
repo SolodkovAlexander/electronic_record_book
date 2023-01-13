@@ -3,11 +3,13 @@ import { Container } from 'react-bootstrap';
 import { MemoryRouter, Routes, Route, BrowserRouter } from 'react-router-dom';
 import { ExampleNavBar } from './components/ExampleNavBar';
 import Professor from './models/Professor';
-import { GroupsPage } from './pages/GroupsPage';
+import GroupCreate from './pages/Groups/GroupsCreate';
+import { GroupsPage } from './pages/Groups/GroupsPage';
 import LandingPage from './pages/LandingPage';
 import ProfessorCreate from './pages/Professor/ProfessorCreate';
 import { ProfessorsPage } from './pages/Professor/ProfessorsPage';
-import { StudentsPage } from './pages/StudentsPage';
+import StudentCreate from './pages/Student/StudentCreate';
+import { StudentsPage } from './pages/Student/StudentsPage';
 // import { Link } from "react-router-dom";
 interface IProps {
 }
@@ -34,6 +36,8 @@ class App extends React.Component<IProps, IState> {
             <Route path="/students" element={<StudentsPage />} />
             <Route path="/student_group" element={<GroupsPage />} />
             <Route path="/professor_create" element={<ProfessorCreate/>} />
+            <Route path="/student_create" element={<StudentCreate/>} />
+            <Route path="/student_group_create" element={<GroupCreate />} />
           </Routes>        
         </Container>
       </BrowserRouter>
