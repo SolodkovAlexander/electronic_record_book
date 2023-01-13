@@ -66,23 +66,23 @@ export class Application {
             return;
         }
 
-        //Delete all existing not system tables
-        const tablesInfo: any = await Application.getTablesInfo({
-            system: false
-        });
-        if (!(await Application.deleteTables(tablesInfo))) {
-            return;
-        }
+        // //Delete all existing not system tables
+        // const tablesInfo: any = await Application.getTablesInfo({
+        //     system: false
+        // });
+        // if (!(await Application.deleteTables(tablesInfo))) {
+        //     return;
+        // }
 
         //Create new tables
-        if (!(await Application.createTables(databaseSchema.tables))) {
-            return;
-        }
+        // if (!(await Application.createTables(databaseSchema.tables))) {
+        //     return;
+        // }
 
-        //Fill tables content
-        if (!(await Application.createTablesObjects(databaseSchemaContent))) {
-            return;
-        }
+        // //Fill tables content
+        // if (!(await Application.createTablesObjects(databaseSchemaContent))) {
+        //     return;
+        // }
 
         Application.initilized = true;
     }
@@ -429,6 +429,39 @@ export class Application {
                 } as IRequestParams,
                 dataParams: {
                     data: tablesObjectsInfo[tableName]
+                }
+            } as IParamsApplicationDoRequest);
+            if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
+                Application.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+                return null;
+            }
+
+            Application.log(`Application::createTables:Create new objects in ${tableName} finished`);
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Create new objects in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
+    public static async createTablesObjectsRelations(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects in each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperationRelation}/${tableName}`,
+                    method: "post",
+                    headers: {
+                        "user-token": Application.userToken
+                    }
+                } as IRequestParams,
+                dataParams: {
+                    data: [tablesObjectsInfo[tableName]] //strict! Must be an array
                 }
             } as IParamsApplicationDoRequest);
             if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
