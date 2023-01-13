@@ -28,6 +28,9 @@ export const requestSettings: any = {
         "auth-key": "liumhkaocvikfcigjfnvjkapugishxvhsjdv"
     },
     userInfo: {
+        /** 
+         * Ypu can create user on `Data` tab on `System data` article.
+         */
         url: `https://${backendlessAppInfo.subdomain}.backendless.app`,
         login: "admspo@gmail.com",
         password: "123456"
