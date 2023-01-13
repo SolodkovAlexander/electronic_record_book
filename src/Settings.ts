@@ -6,15 +6,16 @@ export const backendlessAppInfo: any = {
      * Part of Backendless subdomain.
      * Ex.: if subdomain = "readytemper", then Backendless subdomain = "readytemper.backendless.app".
      */
-    subdomain: "primosea",
+    // serverURL: "https://eu-api.backendless.com",
+    subdomain: "cuddlypear",
     /**
      *  Application ID.
      */
-    applicationId: "66FA45F3-E53D-16C3-FFBE-FDF3F161CF00",
+    applicationId: "0DFA9DFB-2242-742A-FFE6-2864198CB900",
     /** 
      * REST API key.
      */
-    RESTApiKey: "5E37969E-D267-406F-AB19-2486635B82E7"
+    RESTApiKey: "0ACE48F2-A627-48E1-984F-CA554A6DC74C"
 };
 
 /**
@@ -22,12 +23,9 @@ export const backendlessAppInfo: any = {
  */
 export const requestSettings: any = {
     developerInfo: {
+        // serverURL: "https://eu-api.backendless.com",
         url: `https://develop.backendless.com/${backendlessAppInfo.applicationId}`,
-        /** 
-         * You can find this on any HTTP-request with data on `Data` tab (ex. create table).
-         * The key may be expired?
-         */
-        "auth-key": "wwxnlntjitsgkyeerzqqcqoxdwojbrgtcumw"
+        "auth-key": "liumhkaocvikfcigjfnvjkapugishxvhsjdv"
     },
     userInfo: {
         /** 
@@ -35,7 +33,7 @@ export const requestSettings: any = {
          */
         url: `https://${backendlessAppInfo.subdomain}.backendless.app`,
         login: "admspo@gmail.com",
-        password: "12345678"
+        password: "123456"
     }
 };
 
@@ -47,7 +45,8 @@ export const taskRequestUrls: any = {
     checkValidOfUserToken: `${requestSettings.userInfo.url}/api/users/isvalidusertoken`,
     developTableOperation: `${requestSettings.developerInfo.url}/console/data/tables`,
     tableObjectOperation: `${requestSettings.userInfo.url}/api/data/bulk`,
-    updateTableObject: `${requestSettings.userInfo.url}/api/data`
+    updateTableObject: `${requestSettings.userInfo.url}/api/data`,
+    getTableData: `${requestSettings.userInfo.url}/api/data` //just for test, yes, i know it's the same as previous row
 };
 
 /**

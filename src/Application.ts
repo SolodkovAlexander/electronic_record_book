@@ -6,6 +6,8 @@ import {
     taskRequestUrls
 } from "./Settings";
 
+import Professor from "./models/Professor";
+
 /**
  * HTTP-request params.
  * Main properties: url, method etc.
@@ -64,23 +66,23 @@ export class Application {
             return;
         }
 
-        //Delete all existing not system tables
-        const tablesInfo: any = await Application.getTablesInfo({
-            system: false
-        });
-        if (!(await Application.deleteTables(tablesInfo))) {
-            return;
-        }
+        // //Delete all existing not system tables
+        // const tablesInfo: any = await Application.getTablesInfo({
+        //     system: false
+        // });
+        // if (!(await Application.deleteTables(tablesInfo))) {
+        //     return;
+        // }
 
-        //Create new tables
-        if (!(await Application.createTables(databaseSchema.tables))) {
-            return;
-        }
+        // //Create new tables
+        // if (!(await Application.createTables(databaseSchema.tables))) {
+        //     return;
+        // }
 
-        //Fill tables content
-        if (!(await Application.createTablesObjects(databaseSchemaContent))) {
-            return;
-        }
+        // //Fill tables content
+        // if (!(await Application.createTablesObjects(databaseSchemaContent))) {
+        //     return;
+        // }
 
         Application.initilized = true;
     }
