@@ -415,6 +415,38 @@ export class Application {
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.
      */
+    public static async updateTableSingleObject(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects in each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperationRelation}/${tableName}`,
+                    method: "put",
+                    headers: {
+                        "user-token": Application.userToken
+                    }
+                } as IRequestParams,
+                dataParams: { data: tablesObjectsInfo[tableName]}
+            } as IParamsApplicationDoRequest);
+            
+            if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
+                Application.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+                return null;
+            }
+
+            Application.log(`Application::createTables:Create new objects in ${tableName} finished`);
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Create new objects in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
     public static async createTablesObjects(tablesObjectsInfo: any): Promise<any | null> {
         //Create new objects in each table
         let result: any = {};
@@ -444,7 +476,7 @@ export class Application {
     }
 
     /**
-     * Create new objects in tables.
+     * Create new objects relations in tables.
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.
      */
@@ -456,6 +488,68 @@ export class Application {
                 params: {
                     url: `${taskRequestUrls.tableObjectOperationRelation}/${tableName}`,
                     method: "post",
+                    headers: {
+                        "user-token": Application.userToken
+                    }
+                } as IRequestParams,
+                dataParams: {
+                    data: [tablesObjectsInfo[tableName]] //strict! Must be an array
+                }
+            } as IParamsApplicationDoRequest);
+            // if (!doRequestResult || Object.keys(doRequestResult).length !== tablesObjectsInfo[tableName].length) {
+            //     Application.log(`Application::createTables:Create new objects in ${tableName} failed`, true);
+            //     return null;
+            // }
+
+            Application.log(`Application::createTables:Create new objects relation in ${tableName} finished with code ${doRequestResult}`);
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Create new objects relations in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
+    public static async deleteTablesObjectsRelations(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects in each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperationRelation}/${tableName}`,
+                    method: "delete",
+                    headers: {
+                        "user-token": Application.userToken
+                    }
+                } as IRequestParams,
+                dataParams: {
+                    data: [tablesObjectsInfo[tableName]] //strict! Must be an array
+                }
+            } as IParamsApplicationDoRequest);
+
+            Application.log(`Application::createTables:Remove object relations in ${tableName} finished`);
+            result[tableName] = doRequestResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * Update objects relations in tables.
+     * @param tablesObjectsInfo Tables objects info.
+     * @returns Operation result.
+     */
+    public static async updateTablesObjectsRelations(tablesObjectsInfo: any): Promise<any | null> {
+        //Create new objects in each table
+        let result: any = {};
+        for (let tableName in tablesObjectsInfo) {
+            const doRequestResult: any = await Application.doRequest({
+                params: {
+                    url: `${taskRequestUrls.tableObjectOperationRelation}/${tableName}`,
+                    method: "put",
                     headers: {
                         "user-token": Application.userToken
                     }
@@ -562,7 +656,7 @@ export class Application {
         return (await Application.deleteTablesObjects(params))[tableName] === 1;
     }
 
-    /**
+     /**
      * Update objects in tables.
      * @param tablesObjectsInfo Tables objects info.
      * @returns Operation result.

@@ -19,79 +19,42 @@ export default function GroupEdit() {
     const [professors, setProfessors] = useState([{ label: 'none', value: 'none' }]);
 
     const [professorId, setProfessorId] = useState('');
+    const [oldProfessorId, setOldProfessorId] = useState('');
+
+    useEffect(() => {
+        if (id){
+            getGroup(id);
+        }
+    },[id]);
 
     // useEffect to async call for data
     useEffect(() => {
         async function getProfessorAsync() {
-            const result = new Promise<any>((resolve, reject) => { resolve(RequestHelper.getTableData('professor')) });
+            const result = await RequestHelper.getTableData('professor');
 
-            result.then((res: any) => {
-                let a: any[] = [];
-                res.forEach((res: { last_name: any; objectId: any; }) => {
-                    a.push({ label: res.last_name, value: res.objectId });
-                });
-                console.log(a);
+            let a: any[] = [];
+            result.forEach((res: { last_name: any; objectId: any; }) => {
+                a.push({ label: res.last_name, value: res.objectId });
+            });
+            // console.log(a);
 
-                let prof = new Promise<any>((resolve, reject) => {
-                    resolve(setProfessors(a));
-                });
-
-                prof.then((prof_res) => {
-                    if (id) {
-                        let b = new Promise<any>((resolve, reject) => { resolve(getGroup(id)) });
-                        b.then((b_res) => {
-                            console.log('defaultValue');
-                            console.log(professors);
-                            console.log(professors[professors.findIndex(x => x.value === professorId)]);
-
-
-                            console.log('defaultValue after');
-                            console.log(professors);
-                            console.log(professors[professors.findIndex(x => x.value === professorId)]);
-                        });
-
-                    }
-                }
-                );
-
-            })
-
-            // console.log('defaultValue try 2');
-            // console.log(professors);
-            // console.log(professors[professors.findIndex(x => x.value === professorId)]);
-
-            // console.log(result);
-            // console.log(professors);
+            setProfessors(a);
         }
         getProfessorAsync();
-        // console.log('defaultValue try 2');
-        // console.log(professors);
-        // console.log(professors[professors.findIndex(x => x.value === professorId)]);
-
-
-    }, [id]);
+    }, []);
 
     const getGroup = (id: string) => {
         async function getCurrentGroupAsync() {
-            const result = await new Promise<any>((resolve, reject) => { resolve(RequestHelper.getTableDataObjectWithRelations(id, 'student_group', 'curator')) });
-            // let a: any[] = [];
-            // result.forEach((res: { last_name: any; objectId: any; }) => {
-            //     a.push({ label: res.last_name, value: res.objectId });
-            // });
+            const result = await RequestHelper.getTableDataObjectWithRelations(id, 'student_group', 'curator');
+            
             if (result) {
                 setName(result.name);
                 setDescription(result.description);
                 if (result.curator) {
                     setProfessorId(result.curator.objectId);
-                    console.log('pupapaa');
-                    console.log(result.curator.objectId);
-                    console.log(professorId);
+                    setOldProfessorId(professorId);
                 }
             }
-
-            // setProfessors(a);
-            // console.log(result);
-            // console.log(professors);
         }
         getCurrentGroupAsync();
     };
@@ -105,25 +68,34 @@ export default function GroupEdit() {
         }
     };
 
-    // useEffect(() => {
-    //     if (id)
-    //       getGroup(id);
-    //   }, [id]);
-
-    const postData = () => {
+    const updateData = () => {
         setSubmitted(true);
         console.log(name);
         console.log(description);
         let rec_id = '';
-        Application.createTablesObjects({ student_group: [{ "name": name, "description": description }] }).then(
+        let update_student_group_url = '';
+        if (id){
+            // update_student_group_url = 'student_group/' + id.toString();
+
+        // { [update_student_group_url]: { "name": name, "description": description } }
+        Application.updateTableObjectByObjectId('student_group',id.toString(),{"name": name, "description": description},false).then(
             (response: any) => {
                 setSubmitted(true);
                 console.log(response);
-                rec_id = response.student_group[0];
-                console.log(rec_id);
+                // rec_id = response.student_group[0];
+                // console.log(rec_id);
 
-                let url = 'student_group/' + rec_id.toString() + '/curator';
+                let url = 'student_group/' + id.toString() + '/curator';
                 console.log(url);
+                console.log('remove old relation');
+                Application.deleteTablesObjectsRelations({ [url]: oldProfessorId }).then(
+                    (response: any) => {
+                        console.log(response);
+                    })
+                    .catch((e: Error) => {
+                        console.log(e);
+                    });
+                console.log('add new relation');
                 Application.createTablesObjectsRelations({ [url]: professorId }).then(
                     (response: any) => {
                         console.log(response);
@@ -135,20 +107,20 @@ export default function GroupEdit() {
             .catch((e: Error) => {
                 console.log(e);
             });
-    }
+        }
+    };
     return (
         <div className="submit-form">
             {submitted ? (
                 <div>
-                    <h4>Group added successfully!</h4>
+                    <h4>Group updated successfully!</h4>
                     {/* <button className="btn btn-success me-3" onClick={newGroup}>
                         Add another
                     </button> */}
-                    <a className="btn btn-warning" role="button" href="/Groups">Back to Groups</a>
+                    <a className="btn btn-warning" role="button" href="/student_group">Back to Groups</a>
                 </div>
             ) : (
                 <div>
-                    <div>{id}</div>
                     <div className="form-group">
                         <label htmlFor="name">Имя</label>
                         <input
@@ -179,8 +151,8 @@ export default function GroupEdit() {
                         <Select id="professor" options={professors} value={professors[professors.findIndex(x => x.value === professorId)]} onChange={handleOption} />
                     </div>
 
-                    <button onClick={postData} className="btn btn-success mt-3">
-                        Save
+                    <button onClick={updateData} className="btn btn-success mt-3">
+                        Update
                     </button>
                 </div>
             )}

@@ -14,7 +14,7 @@ import { RequestHelper } from '../../helpers/RequestHelper';
 import Group from '../../models/Group';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { BsFillPersonPlusFill } from 'react-icons/bs';
+import { BsFillPersonFill, BsFillPersonPlusFill, BsFillPersonXFill } from 'react-icons/bs';
 
 export const GroupsPage = () => {
   // useState for tracking data after render
@@ -31,16 +31,25 @@ export const GroupsPage = () => {
   }, []);
 
   const ButtonRenderer = (params: any) => {
-    return <Button variant="info" onClick={() => console.log(params.data.objectId)}>
+    return <>
+    <Button variant="info" onClick={() => console.log(params.data.objectId)} className="me-1">
       <Link to={"/student_group/"+params.data.objectId} className="nav-link">
-        <BsFillPersonPlusFill /> Edit
+        <BsFillPersonFill /> Edit
       </Link>
     </Button>
+    <Button variant="danger" onClick={() => console.log(params.data.objectId)}>
+      <Link to={"/student_group_delete/"+params.data.objectId} className="nav-link">
+        <BsFillPersonXFill /> Remove
+      </Link>
+    </Button>
+    </>
   };
     
   const [columnDefs] = useState(Group.describe().concat({
     field: "year",
-    cellRenderer: ButtonRenderer
+    cellRenderer: ButtonRenderer,
+    width: 220,
+    resizable: true
   }));
 
   return (
@@ -56,7 +65,7 @@ export const GroupsPage = () => {
 
       <div
         className="ag-theme-alpine"
-        style={{ height: 300, width: 800 }}>
+        style={{ height: 300, width: 900 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}>
