@@ -22,16 +22,26 @@ export const GroupsPage = () => {
 
   // useEffect to async call for data
   useEffect(() => {
-    async function getProfessorAsync() {
-      const result = await RequestHelper.getTableData('student_group');;
+    async function getGroupsAsync() {
+      const result = await RequestHelper.getTableDataWithRelations('student_group', 'curator');;
       setRowData(result);
       console.log(result);
     }
-    getProfessorAsync();
+    getGroupsAsync();
   }, []);
 
-  const [columnDefs] = useState(Group.describe());
-  const [applicationInitializeProgress] = useState(10);
+  const ButtonRenderer = (params: any) => {
+    return <Button variant="info" onClick={() => console.log(params.data.objectId)}>
+      <Link to={"/student_group/"+params.data.objectId} className="nav-link">
+        <BsFillPersonPlusFill /> Edit
+      </Link>
+    </Button>
+  };
+    
+  const [columnDefs] = useState(Group.describe().concat({
+    field: "year",
+    cellRenderer: ButtonRenderer
+  }));
 
   return (
     <div className="d-flex flex-column p-2">

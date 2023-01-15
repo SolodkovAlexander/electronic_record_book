@@ -9,8 +9,11 @@ export default class Group {
     
   }
 
+  rowDataGetter = function (params: any) {
+    return params.data;
+  };
   // return model fields to render table
   static describe(): any {
-    return [{ field: 'name', headerName: 'Наименование' }, {field: 'description', headerName: 'Описание' } ];
+    return [{ field: 'name', headerName: 'Наименование' }, {field: 'description', headerName: 'Описание' }, {field: 'curator.last_name', headerName: 'Тьютор'} ];
   }
 }

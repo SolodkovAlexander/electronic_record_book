@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route, BrowserRouter } from 'react-router-dom';
 import { ExampleNavBar } from './components/ExampleNavBar';
 import Professor from './models/Professor';
 import GroupCreate from './pages/Groups/GroupsCreate';
+import GroupEdit from './pages/Groups/GroupsEdit';
 import { GroupsPage } from './pages/Groups/GroupsPage';
 import LandingPage from './pages/LandingPage';
 import ProfessorCreate from './pages/Professor/ProfessorCreate';
@@ -38,6 +39,7 @@ class App extends React.Component<IProps, IState> {
             <Route path="/professor_create" element={<ProfessorCreate/>} />
             <Route path="/student_create" element={<StudentCreate/>} />
             <Route path="/student_group_create" element={<GroupCreate />} />
+            <Route path="/student_group/:id" element={<GroupEdit />} />
           </Routes>        
         </Container>
       </BrowserRouter>

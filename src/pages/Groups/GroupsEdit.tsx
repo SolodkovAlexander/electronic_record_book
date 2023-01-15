@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap'
+import { useParams } from 'react-router-dom';
 import Select, { OnChangeValue } from 'react-select';
 import { Application } from '../../Application';
 import { RequestHelper } from '../../helpers/RequestHelper';
@@ -8,7 +9,9 @@ import { RequestHelper } from '../../helpers/RequestHelper';
 // define your option type
 type MyOption = { label: string, value: string }
 
-export default function GroupCreate() {
+export default function GroupEdit() {
+    const { id } = useParams();
+
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [submitted, setSubmitted] = useState(false);
@@ -17,12 +20,82 @@ export default function GroupCreate() {
 
     const [professorId, setProfessorId] = useState('');
 
+    // useEffect to async call for data
+    useEffect(() => {
+        async function getProfessorAsync() {
+            const result = new Promise<any>((resolve, reject) => { resolve(RequestHelper.getTableData('professor')) });
 
-    // const handleSelectionChange = (option: ) => {
-    //     if (option) {
-    //       setMyState(option)
-    //     }
-    //   };
+            result.then((res: any) => {
+                let a: any[] = [];
+                res.forEach((res: { last_name: any; objectId: any; }) => {
+                    a.push({ label: res.last_name, value: res.objectId });
+                });
+                console.log(a);
+
+                let prof = new Promise<any>((resolve, reject) => {
+                    resolve(setProfessors(a));
+                });
+
+                prof.then((prof_res) => {
+                    if (id) {
+                        let b = new Promise<any>((resolve, reject) => { resolve(getGroup(id)) });
+                        b.then((b_res) => {
+                            console.log('defaultValue');
+                            console.log(professors);
+                            console.log(professors[professors.findIndex(x => x.value === professorId)]);
+
+
+                            console.log('defaultValue after');
+                            console.log(professors);
+                            console.log(professors[professors.findIndex(x => x.value === professorId)]);
+                        });
+
+                    }
+                }
+                );
+
+            })
+
+            // console.log('defaultValue try 2');
+            // console.log(professors);
+            // console.log(professors[professors.findIndex(x => x.value === professorId)]);
+
+            // console.log(result);
+            // console.log(professors);
+        }
+        getProfessorAsync();
+        // console.log('defaultValue try 2');
+        // console.log(professors);
+        // console.log(professors[professors.findIndex(x => x.value === professorId)]);
+
+
+    }, [id]);
+
+    const getGroup = (id: string) => {
+        async function getCurrentGroupAsync() {
+            const result = await new Promise<any>((resolve, reject) => { resolve(RequestHelper.getTableDataObjectWithRelations(id, 'student_group', 'curator')) });
+            // let a: any[] = [];
+            // result.forEach((res: { last_name: any; objectId: any; }) => {
+            //     a.push({ label: res.last_name, value: res.objectId });
+            // });
+            if (result) {
+                setName(result.name);
+                setDescription(result.description);
+                if (result.curator) {
+                    setProfessorId(result.curator.objectId);
+                    console.log('pupapaa');
+                    console.log(result.curator.objectId);
+                    console.log(professorId);
+                }
+            }
+
+            // setProfessors(a);
+            // console.log(result);
+            // console.log(professors);
+        }
+        getCurrentGroupAsync();
+    };
+
 
     const handleOption = (selection: MyOption | null) => {
         //   setProfessorId(selection);
@@ -32,30 +105,10 @@ export default function GroupCreate() {
         }
     };
 
-
-
-    // useEffect to async call for data
-    useEffect(() => {
-        async function getProfessorAsync() {
-            const result = await RequestHelper.getTableData('professor');
-            let a: any[] = [];
-            result.forEach((res: { last_name: any; objectId: any; }) => {
-                a.push({ label: res.last_name, value: res.objectId });
-            });
-            console.log(a);
-            setProfessors(a);
-            // console.log(result);
-            // console.log(professors);
-        }
-        getProfessorAsync();
-    }, []);
-
-
-    const newGroup = () => {
-        setName("");
-        setDescription("");
-        setSubmitted(false);
-    }
+    // useEffect(() => {
+    //     if (id)
+    //       getGroup(id);
+    //   }, [id]);
 
     const postData = () => {
         setSubmitted(true);
@@ -88,13 +141,14 @@ export default function GroupCreate() {
             {submitted ? (
                 <div>
                     <h4>Group added successfully!</h4>
-                    <button className="btn btn-success me-3" onClick={newGroup}>
+                    {/* <button className="btn btn-success me-3" onClick={newGroup}>
                         Add another
-                    </button>
+                    </button> */}
                     <a className="btn btn-warning" role="button" href="/Groups">Back to Groups</a>
                 </div>
             ) : (
                 <div>
+                    <div>{id}</div>
                     <div className="form-group">
                         <label htmlFor="name">Имя</label>
                         <input
@@ -122,7 +176,7 @@ export default function GroupCreate() {
                     </div>
                     <div>
                         <label htmlFor="professor">Тьютор (закрепленный преподаватель)</label>
-                        <Select id="professor" options={professors} onChange={handleOption} />
+                        <Select id="professor" options={professors} value={professors[professors.findIndex(x => x.value === professorId)]} onChange={handleOption} />
                     </div>
 
                     <button onClick={postData} className="btn btn-success mt-3">
