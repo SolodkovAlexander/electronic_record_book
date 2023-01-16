@@ -15,20 +15,38 @@ import Group from '../../models/Group';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { BsFillPersonFill, BsFillPersonPlusFill, BsFillPersonXFill } from 'react-icons/bs';
+import { Application } from '../../Application';
 
 export const GroupsPage = () => {
   // useState for tracking data after render
   const [rowData, setRowData] = useState();
 
+  async function getGroupsAsync() {
+    const result = await RequestHelper.getTableDataWithRelations('student_group', 'curator');;
+    setRowData(result);
+    console.log(result);
+  };
+
   // useEffect to async call for data
   useEffect(() => {
-    async function getGroupsAsync() {
-      const result = await RequestHelper.getTableDataWithRelations('student_group', 'curator');;
-      setRowData(result);
-      console.log(result);
-    }
     getGroupsAsync();
   }, []);
+
+  const deleteGroup = (id: string) => {
+    async function deleteCurrentGroupAsync() {
+        console.log(id);
+        alert('Are you sure, you want to remove this group?');
+
+        const result = await Application.deleteTableObjectByObjectId('student_group', id);
+        
+        if (result) {
+            alert('Group removed successfully.');
+        }
+        // refresh data in table
+        getGroupsAsync();
+    }
+    deleteCurrentGroupAsync();
+  };
 
   const ButtonRenderer = (params: any) => {
     return <>
@@ -37,16 +55,17 @@ export const GroupsPage = () => {
         <BsFillPersonFill /> Edit
       </Link>
     </Button>
-    <Button variant="danger" onClick={() => console.log(params.data.objectId)}>
-      <Link to={"/student_group_delete/"+params.data.objectId} className="nav-link">
+    <Button variant="danger" onClick={() => deleteGroup(params.data.objectId)}>
+      {/* <Link to={"/student_group_delete/"+params.data.objectId} className="nav-link"> */}
         <BsFillPersonXFill /> Remove
-      </Link>
+      {/* </Link> */}
     </Button>
     </>
   };
     
   const [columnDefs] = useState(Group.describe().concat({
-    field: "year",
+    field: 'action',
+    headerName: 'Действие',
     cellRenderer: ButtonRenderer,
     width: 220,
     resizable: true

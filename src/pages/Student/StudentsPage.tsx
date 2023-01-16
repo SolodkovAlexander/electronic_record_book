@@ -14,25 +14,61 @@ import { RequestHelper } from '../../helpers/RequestHelper';
 import Student from '../../models/Student';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { BsFillPersonPlusFill } from 'react-icons/bs';
+import { BsFillPersonFill, BsFillPersonPlusFill, BsFillPersonXFill } from 'react-icons/bs';
+import { Application } from '../../Application';
 
 
 export const StudentsPage = () => {
   // useState for tracking data after render
   const [rowData, setRowData] = useState();
 
+  const deleteStudent = (id: string) => {
+    async function deleteCurrentProfessorAsync() {
+        console.log(id);
+        alert('Are you sure, you want to remove this student?');
+
+        const result = await Application.deleteTableObjectByObjectId('student', id);
+        
+        if (result) {
+            alert('Student removed successfully.');
+        }
+        // refresh data in table
+        getStudentAsync();
+    }
+    deleteCurrentProfessorAsync();
+  };
+
+  const ButtonRenderer = (params: any) => {
+    return <>
+    <Button variant="info" onClick={() => console.log(params.data.objectId)} className="me-1">
+      <Link to={"/student/"+params.data.objectId} className="nav-link">
+        <BsFillPersonFill /> Edit
+      </Link>
+    </Button>
+    <Button variant="danger" onClick={() => deleteStudent(params.data.objectId)}>
+      <BsFillPersonXFill /> Remove
+    </Button>
+    </>
+  };
+
+  async function getStudentAsync() {
+    const result = await RequestHelper.getTableData('student');;
+    setRowData(result);
+    console.log(result);
+  }
+
   // useEffect to async call for data
   useEffect(() => {
-    async function getStudentAsync() {
-      const result = await RequestHelper.getTableData('student');;
-      setRowData(result);
-      console.log(result);
-    }
     getStudentAsync();
   }, []);
 
-  const [columnDefs] = useState(Student.describe());
-  const [applicationInitializeProgress] = useState(10);
+  const [columnDefs] = useState(Student.describe().concat({
+    field: 'action',
+    headerName: 'Действие',
+    cellRenderer: ButtonRenderer,
+    width: 220,
+    resizable: true
+  }));
 
   return (
     <div className="d-flex flex-column p-2">
@@ -46,7 +82,7 @@ export const StudentsPage = () => {
       </div>
       <div
         className="ag-theme-alpine"
-        style={{ height: 300, width: 800 }}>
+        style={{ height: 300, width: 900 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}>

@@ -91,7 +91,7 @@ export default function GroupCreate() {
                     <button className="btn btn-success me-3" onClick={newGroup}>
                         Add another
                     </button>
-                    <a className="btn btn-warning" role="button" href="/Groups">Back to Groups</a>
+                    <a className="btn btn-warning" role="button" href="/student_group">Back to Groups</a>
                 </div>
             ) : (
                 <div>
