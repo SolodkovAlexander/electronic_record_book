@@ -17,13 +17,6 @@ export default function GroupCreate() {
 
     const [professorId, setProfessorId] = useState('');
 
-
-    // const handleSelectionChange = (option: ) => {
-    //     if (option) {
-    //       setMyState(option)
-    //     }
-    //   };
-
     const handleOption = (selection: MyOption | null) => {
         //   setProfessorId(selection);
         if (selection) {

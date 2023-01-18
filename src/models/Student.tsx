@@ -13,6 +13,9 @@ export default class Student {
   static describe(): any {
     return [{ field: 'last_name', headerName: 'Фамилия' },
     { field: 'first_name', headerName: 'Имя' },
-    { field: 'other_name', headerName: 'Отчество' }];
+    { field: 'other_name', headerName: 'Отчество' },
+    { field: 'phone', headerName: 'Телефон' },
+    { field: 'email', headerName: 'Почта' },
+    { field: 'group.name', headerName: 'Группа' }];
   }
 }

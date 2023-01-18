@@ -141,6 +141,43 @@ export const databaseSchema: any = {
                     "name": "other_name",
                     "dataType": "STRING",
                     "defaultValue": ""
+                },
+                {
+                    "name": "phone",
+                    "dataType": "STRING",
+                    "defaultValue": ""
+                },
+                {
+                    "name": "email",
+                    "dataType": "STRING",
+                    "defaultValue": ""
+                }
+            ],
+            references: [
+                {
+                    "name": "group",
+                    "dataType": "DATA_REF",
+                    "required": false,
+                    "indexed": false,
+                    "defaultValue": null,
+                    "relationshipType": "ONE_TO_ONE",
+                    "toTableName": "student_group",
+                    fieldName: "objectId"
+                }
+            ]
+        },
+        {
+            "name": "discipline",
+            "columns": [
+                {
+                    "name": "name",
+                    "dataType": "STRING",
+                    "required": true
+                },
+                {
+                    "name": "description",
+                    "dataType": "STRING",
+                    "defaultValue": ""
                 }
             ],
             references: [
@@ -155,7 +192,69 @@ export const databaseSchema: any = {
                     fieldName: "objectId"
                 }
             ]
+        },
+        {
+            "name": "test_type",
+            "columns": [
+                {
+                    "name": "name",
+                    "dataType": "STRING",
+                    "required": true
+                },
+                {
+                    "name": "description",
+                    "dataType": "STRING",
+                    "defaultValue": ""
+                }
+            ]
+        },
+        {
+            "name": "student_grade",
+            "columns": [
+                {
+                    "name": "grade",
+                    "dataType": "STRING",
+                    "required": true
+                },
+                {
+                    "name": "grade_receipt_date",
+                    "dataType": "DATETIME"
+                }
+            ],
+            references: [
+                {
+                    "name": "discipline",
+                    "dataType": "DATA_REF",
+                    "required": true,
+                    "indexed": false,
+                    "defaultValue": null,
+                    "relationshipType": "ONE_TO_ONE",
+                    "toTableName": "discipline",
+                    fieldName: "objectId"
+                },
+                {
+                    "name": "student",
+                    "dataType": "DATA_REF",
+                    "required": true,
+                    "indexed": false,
+                    "defaultValue": null,
+                    "relationshipType": "ONE_TO_ONE",
+                    "toTableName": "student",
+                    fieldName: "objectId"
+                },
+                {
+                    "name": "test_type",
+                    "dataType": "DATA_REF",
+                    "required": true,
+                    "indexed": false,
+                    "defaultValue": null,
+                    "relationshipType": "ONE_TO_ONE",
+                    "toTableName": "test_type",
+                    fieldName: "objectId"
+                }
+            ]
         }
+
     ]
 };
 
@@ -204,6 +303,24 @@ export const databaseSchemaContent: any = {
         },
         {
             "name": "M-44"
+        }
+    ],
+    test_type: [
+        {
+            "name": "Экзамен",
+            "description": "В зачетку выставляются значения: отлично, хорошо, удовл, неуд."
+        },
+        {
+            "name": "Зачет",
+            "description": "В зачетку выставляются значения: зачет, не зачет."
+        },
+        {
+            "name": "Практика (с оценкой)",
+            "description": "В зачетку выставляются значения: отлично, хорошо, удовл, неуд."
+        },
+        {
+            "name": "Практика",
+            "description": "В зачетку выставляются значения: пройдено, не пройдено."
         }
     ]
 };

@@ -74,7 +74,7 @@ export class Application {
         //     return;
         // }
 
-        //Create new tables
+        // // Create new tables
         // if (!(await Application.createTables(databaseSchema.tables))) {
         //     return;
         // }

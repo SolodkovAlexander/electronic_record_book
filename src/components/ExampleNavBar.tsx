@@ -23,6 +23,10 @@ export const ExampleNavBar: FC = () => {
               <NavDropdown.Item href="/students">Students</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/student_group">Groups</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="/disciplines">Disciplines</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="/student_grades">Students Grades</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

@@ -22,6 +22,18 @@ export const StudentsPage = () => {
   // useState for tracking data after render
   const [rowData, setRowData] = useState();
 
+  async function getStudentsAsync() {
+    const result = await RequestHelper.getTableDataWithRelations('student', 'group');;
+    setRowData(result);
+    console.log(result);
+  };
+
+  // useEffect to async call for data
+  useEffect(() => {
+    getStudentsAsync();
+  }, []);
+
+
   const deleteStudent = (id: string) => {
     async function deleteCurrentProfessorAsync() {
         console.log(id);
@@ -82,7 +94,7 @@ export const StudentsPage = () => {
       </div>
       <div
         className="ag-theme-alpine"
-        style={{ height: 300, width: 900 }}>
+        style={{ height: 300, width: 1400 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}>

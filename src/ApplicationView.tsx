@@ -3,6 +3,9 @@ import { Container } from 'react-bootstrap';
 import { MemoryRouter, Routes, Route, BrowserRouter } from 'react-router-dom';
 import { ExampleNavBar } from './components/ExampleNavBar';
 import Professor from './models/Professor';
+import DisciplineCreate from './pages/Discipline/DisciplineCreate';
+import DisciplineEdit from './pages/Discipline/DisciplineEdit';
+import { DisciplinesPage } from './pages/Discipline/DisciplinesPage';
 import GroupCreate from './pages/Groups/GroupsCreate';
 import GroupEdit from './pages/Groups/GroupsEdit';
 import { GroupsPage } from './pages/Groups/GroupsPage';
@@ -13,6 +16,9 @@ import { ProfessorsPage } from './pages/Professor/ProfessorsPage';
 import StudentCreate from './pages/Student/StudentCreate';
 import StudentEdit from './pages/Student/StudentEdit';
 import { StudentsPage } from './pages/Student/StudentsPage';
+import StudentGradeCreate from './pages/StudentMark/StudentGradeCreate';
+import StudentGradeEdit from './pages/StudentMark/StudentGradeEdit';
+import { StudentGradesPage } from './pages/StudentMark/StudentGradesPage';
 // import { Link } from "react-router-dom";
 interface IProps {
 }
@@ -31,7 +37,7 @@ class App extends React.Component<IProps, IState> {
       
       <BrowserRouter>
         <ExampleNavBar />
-        <Container>
+        <Container style={{ margin: '0 auto' }} >
           {/* in react-route-dom v6 there is no Swoitch (like v5), now it's Routes */}
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -39,6 +45,14 @@ class App extends React.Component<IProps, IState> {
             <Route path="/professor_create" element={<ProfessorCreate/>} />
             <Route path="/professor/:id" element={<ProfessorEdit/>} />
             
+            <Route path="/disciplines" element={<DisciplinesPage />} />
+            <Route path="/discipline/:id" element={<DisciplineEdit/>} />
+            <Route path="/discipline_create" element={<DisciplineCreate/>} />
+
+            <Route path="/student_grades" element={<StudentGradesPage />} />
+            <Route path="/student_grade/:id" element={<StudentGradeEdit/>} />
+            <Route path="/student_grade_create" element={<StudentGradeCreate/>} />
+
             <Route path="/students" element={<StudentsPage />} />
             <Route path="/student/:id" element={<StudentEdit/>} />
             <Route path="/student_create" element={<StudentCreate/>} />
