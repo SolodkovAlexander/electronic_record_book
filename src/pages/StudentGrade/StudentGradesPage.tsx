@@ -52,7 +52,7 @@ export const StudentGradesPage = () => {
   const ButtonRenderer = (params: any) => {
     return <>
       <Button variant="info" onClick={() => console.log(params.data.objectId)} className="me-1">
-        <Link to={"/student_grades/" + params.data.objectId} className="nav-link">
+        <Link to={"/student_grade/" + params.data.objectId} className="nav-link">
           <BsFillPersonFill /> Edit
         </Link>
       </Button>
@@ -85,7 +85,7 @@ export const StudentGradesPage = () => {
 
       <div
         className="ag-theme-alpine"
-        style={{ height: 300, width: 900 }}>
+        style={{ height: 300, width: 1200 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}>

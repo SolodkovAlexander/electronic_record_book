@@ -16,9 +16,9 @@ import { ProfessorsPage } from './pages/Professor/ProfessorsPage';
 import StudentCreate from './pages/Student/StudentCreate';
 import StudentEdit from './pages/Student/StudentEdit';
 import { StudentsPage } from './pages/Student/StudentsPage';
-import StudentGradeCreate from './pages/StudentMark/StudentGradeCreate';
-import StudentGradeEdit from './pages/StudentMark/StudentGradeEdit';
-import { StudentGradesPage } from './pages/StudentMark/StudentGradesPage';
+import StudentGradeCreate from './pages/StudentGrade/StudentGradeCreate';
+import StudentGradeEdit from './pages/StudentGrade/StudentGradeEdit';
+import { StudentGradesPage } from './pages/StudentGrade/StudentGradesPage';
 // import { Link } from "react-router-dom";
 interface IProps {
 }
