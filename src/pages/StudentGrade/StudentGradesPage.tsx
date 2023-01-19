@@ -19,13 +19,12 @@ import { Application } from '../../Application';
 import StudentGrade from '../../models/StudentGrade';
 
 export const StudentGradesPage = () => {
-  // useState for tracking data after render
   const [rowData, setRowData] = useState();
 
   async function getStudentGradesAsync() {
+    // get table data with relations
     const result = await RequestHelper.getTableDataWithRelations('student_grade', 'discipline,student,test_type');;
     setRowData(result);
-    console.log(result);
   };
 
   // useEffect to async call for data
@@ -33,6 +32,7 @@ export const StudentGradesPage = () => {
     getStudentGradesAsync();
   }, []);
 
+  // remove student_grade by id
   const deleteStudentGrade = (id: string) => {
     async function deleteCurrentStudentGradeAsync() {
       console.log(id);
@@ -57,9 +57,7 @@ export const StudentGradesPage = () => {
         </Link>
       </Button>
       <Button variant="danger" onClick={() => deleteStudentGrade(params.data.objectId)}>
-        {/* <Link to={"/student_group_delete/"+params.data.objectId} className="nav-link"> */}
         <BsFillPersonXFill /> Remove
-        {/* </Link> */}
       </Button>
     </>
   };
@@ -85,7 +83,7 @@ export const StudentGradesPage = () => {
 
       <div
         className="ag-theme-alpine"
-        style={{ height: 300, width: 1200 }}>
+        style={{ height: 300, width: 1000 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}>

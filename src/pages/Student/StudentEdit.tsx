@@ -1,18 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form } from 'react-bootstrap'
+import { Button, Card, Form } from 'react-bootstrap'
+import PhoneInput from "react-phone-input-2";
 import { useParams } from 'react-router-dom';
 import Select, { OnChangeValue } from 'react-select';
 import { Application } from '../../Application';
 import { RequestHelper } from '../../helpers/RequestHelper';
 
+type MyOption = { label: string, value: string };
+
 export default function StudentEdit() {
     const { id } = useParams();
 
-    const [first_name, setFirstName] = useState('');
-    const [last_name, setLastName] = useState('');
-    const [other_name, setOtherName] = useState('');
+    // some primary student fiels 
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [otherName, setOtherName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
 
+    // to show user some notice on submit
     const [submitted, setSubmitted] = useState(false);
+
+    const [groups, setGroups] = useState([{ label: 'none', value: 'none' }]);
+
+    const [studentGroupId, setStudentGroupId] = useState('');
+
+    // id's of previously selected values to remove relations with them in tables when call update function
+    const [oldStudentGroupId, setOldStudentGroupId] = useState('');
+
+    const handleOption = (selection: MyOption | null) => {
+        if (selection) {
+            console.log(selection.value);
+            setStudentGroupId(selection.value);
+        }
+    };
+
+    // useEffect to async call for data
+    useEffect(() => {
+        async function getGroupAsync() {
+            const result = await RequestHelper.getTableData('student_group');
+            let a: any[] = [];
+            result.forEach((res: { name: any; objectId: any; }) => {
+                a.push({ label: res.name, value: res.objectId });
+            });
+            console.log(a);
+            setGroups(a);
+            // console.log(result);
+            // console.log(professors);
+        }
+        getGroupAsync();
+    }, []);
+
 
     useEffect(() => {
         if (id) {
@@ -23,12 +61,19 @@ export default function StudentEdit() {
 
     const getStudent = (id: string) => {
         async function getCurrentStudentAsync() {
-            const result = await RequestHelper.getTableDataObject(id, 'student');
+            const result = await RequestHelper.getTableDataObjectWithRelations(id, 'student', 'group');
 
             if (result) {
                 setFirstName(result.first_name);
                 setLastName(result.last_name);
                 setOtherName(result.other_name);
+                setPhone(result.phone);
+                setEmail(result.email);
+
+                if (result.group) {
+                    setStudentGroupId(result.group.objectId);
+                    setOldStudentGroupId(studentGroupId);
+                }
             }
         }
         getCurrentStudentAsync();
@@ -37,13 +82,34 @@ export default function StudentEdit() {
 
     const updateData = () => {
         setSubmitted(true);
-        let rec_id = '';
-        let update_student_group_url = '';
+
         if (id) {
-            Application.updateTableObjectByObjectId('student', id.toString(), { 'first_name': first_name, 'last_name': last_name, 'other_name': other_name }, false).then(
+            Application.updateTableObjectByObjectId('student', id.toString(), { 'first_name': firstName, 'last_name': lastName, 'other_name': otherName }, false).then(
                 (response: any) => {
-                    setSubmitted(true);
+                    // setSubmitted(true);
                     console.log(response);
+
+                    let url: string = 'student/' + id.toString() + '/group';
+                    console.log(url);
+
+                    //udate relations
+                    console.log('remove old relation group');
+                    Application.deleteTablesObjectsRelations({ [url]: oldStudentGroupId }).then(
+                        (response: any) => {
+                            console.log(response);
+                        })
+                        .catch((e: Error) => {
+                            console.log(e);
+                        });
+                    console.log('add new relation');
+                    Application.createTablesObjectsRelations({ [url]: studentGroupId }).then(
+                        (response: any) => {
+                            console.log(response);
+                        })
+                        .catch((e: Error) => {
+                            console.log(e);
+                        });
+
                 })
                 .catch((e: Error) => {
                     console.log(e);
@@ -61,52 +127,88 @@ export default function StudentEdit() {
                     <a className="btn btn-warning" role="button" href="/students">Back to Students</a>
                 </div>
             ) : (
-                <div>
-                    <div className="row">
-                        <div className="form-group col-4">
-                            <label htmlFor="last_name">Фамилия</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="last_name"
-                                required
-                                value={last_name}
-                                onChange={(e) => setLastName(e.target.value)}
-                                name="last_name"
-                            />
-                        </div>
+                <Card className='mt-5' style={{ width: '70rem' }} >
+                    <Card.Header>Add new student</Card.Header>
+                    <Card.Body>
+                        <div>
+                            <div className="row">
+                                <div className="form-group col-4">
+                                    <label htmlFor="last_name">Фамилия</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="last_name"
+                                        required
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        name="last_name"
+                                    />
+                                </div>
 
-                        <div className="form-group col-4">
-                            <label htmlFor="first_name">Имя</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="first_name"
-                                required
-                                value={first_name}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                name="first_name"
-                            />
-                        </div>
+                                <div className="form-group col-4">
+                                    <label htmlFor="first_name">Имя</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="first_name"
+                                        required
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        name="first_name"
+                                    />
+                                </div>
 
-                        <div className="form-group col-4">
-                            <label htmlFor="other_name">Отчество</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="other_name"
-                                required
-                                value={other_name}
-                                onChange={(e) => setOtherName(e.target.value)}
-                                name="other_name"
-                            />
-                        </div>
-                    </div>
+                                <div className="form-group col-4">
+                                    <label htmlFor="other_name">Отчество</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="other_name"
+                                        required
+                                        value={otherName}
+                                        onChange={(e) => setOtherName(e.target.value)}
+                                        name="other_name"
+                                    />
+                                </div>
+                            </div>
 
-                    <button onClick={updateData} className="btn btn-success mt-3">
-                        Update
-                    </button>
-                </div>
+                            <div className="row">
+                                <div className="form-group col-5">
+                                    <PhoneInput
+                                        value={phone}
+                                        onChange={(val) => setPhone(val)}
+                                        country={"ru"}
+                                        disableDropdown={true}
+                                        specialLabel={"Телефон"}
+                                    />
+                                </div>
+
+                                <div className="form-group col-5">
+                                    <label htmlFor="email">Почта</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        name="email"
+                                    />
+                                </div>
+                                <div className="col-2">
+                                    <label htmlFor="group">Группа</label>
+                                    <Select id="group" options={groups} value={groups[groups.findIndex(x => x.value === studentGroupId)]} onChange={handleOption} />
+                                </div>
+                            </div>
+
+                            <div className=' d-flex justify-content-center'>
+                                <button onClick={updateData} className="btn btn-success mt-3">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </Card.Body>
+                </Card>
             )}
         </div>
     )

@@ -26,8 +26,20 @@ export default class StudentGrade {
               wrapHeaderText: true, 
               autoHeaderHeight: true
             }, 
-            { field: 'discipline.name', headerName: 'Дисциплина', width: 180, wrapHeaderText: true, autoHeaderHeight: true },
-            { field: 'student.last_name', headerName: 'Студент', width: 150, wrapHeaderText: true, autoHeaderHeight: true },
+            { field: 'discipline.name', 
+              headerName: 'Дисциплина', 
+              width: 180, 
+              wrapHeaderText: true, 
+              autoHeaderHeight: true },
+            { field: 'student.last_name', 
+              headerName: 'Студент', 
+              cellRenderer: (data: any) => {
+                // get student full name short form (i.e. Brown D.E.)
+                return data.data.student.last_name + (data.data.student.first_name ? ' ' + data.data.student.first_name.charAt(0).concat('.') + (data.data.student.other_name ? data.data.student.other_name.charAt(0).concat('.') : '') : '');
+              },
+              width: 150, 
+              wrapHeaderText: true, 
+              autoHeaderHeight: true },
             { field: 'test_type.name', headerName: 'Вид тестирования', width: 185, wrapHeaderText: true, autoHeaderHeight: true, wrapText: true, autoHeight: true }];
   }
 }

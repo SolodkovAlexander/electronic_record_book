@@ -9,10 +9,10 @@ import { RequestHelper } from '../../helpers/RequestHelper';
 type MyOption = { label: string, value: string }
 
 export default function ProfessorCreate() {
-  const [first_name, setFirstName] = useState('');
-  const [last_name, setLastName] = useState('');
-  const [other_name, setOtherName] = useState('');
-  const [academic_degree, setAcademicDegree] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [otherName, setOtherName] = useState('');
+  const [academicDegree, setAcademicDegree] = useState('');
 
   const [submitted, setSubmitted] = useState(false);
 
@@ -27,7 +27,7 @@ export default function ProfessorCreate() {
   const postData = () => {
     setSubmitted(true);
     let rec_id = '';
-    Application.createTablesObjects({ professor: [{ 'first_name': first_name, 'last_name': last_name, 'other_name': other_name, 'academic_degree': academic_degree }] }).then(
+    Application.createTablesObjects({ professor: [{ 'first_name': firstName, 'last_name': lastName, 'other_name': otherName, 'academic_degree': academicDegree }] }).then(
       (response: any) => {
         setSubmitted(true);
         console.log(response);
@@ -58,7 +58,7 @@ export default function ProfessorCreate() {
                 className="form-control"
                 id="last_name"
                 required
-                value={last_name}
+                value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 name="last_name"
               />
@@ -71,7 +71,7 @@ export default function ProfessorCreate() {
                 className="form-control"
                 id="first_name"
                 required
-                value={first_name}
+                value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 name="first_name"
               />
@@ -84,7 +84,7 @@ export default function ProfessorCreate() {
                 className="form-control"
                 id="other_name"
                 required
-                value={other_name}
+                value={otherName}
                 onChange={(e) => setOtherName(e.target.value)}
                 name="other_name"
               />
@@ -98,7 +98,7 @@ export default function ProfessorCreate() {
               className="form-control"
               id="academic_degree"
               required
-              value={academic_degree}
+              value={academicDegree}
               onChange={(e) => setAcademicDegree(e.target.value)}
               name="academic_degree"
             />

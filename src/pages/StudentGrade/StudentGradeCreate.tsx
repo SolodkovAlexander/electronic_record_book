@@ -10,27 +10,34 @@ type MyOption = { label: string, value: string }
 
 export default function StudentGradeCreate() {
     const [grade, setGrade] = useState('');
-    const [grade_receipt_date, setGradeReceiptDate] = useState('');
+    const [gradeReceiptDate, setGradeReceiptDate] = useState('');
+
+    // to check that data was submitted and show notice
     const [submitted, setSubmitted] = useState(false);
-    // useState for tracking data after render
+
+    // data for select
     const [disciplines, setDisciplines] = useState([{ label: 'none', value: 'none' }]);
     const [students, setStudents] = useState([{ label: 'none', value: 'none' }]);
-    const [test_types, setTestTypes] = useState([{ label: 'none', value: 'none' }]);
+    const [testTypes, setTestTypes] = useState([{ label: 'none', value: 'none' }]);
 
+    // data for grade select, yes grade is string, but i will select it to prevent user's imnput variations
     const [grades, setGrades] = useState([{ label: 'none', value: 'none' }]);
 
+    // id's of selected values to put them in tables (make relations)
     const [disciplineId, setDisciplineId] = useState('');
     const [studentId, setStudentId] = useState('');
     const [testTypeId, setTestTypeId] = useState('');
 
-    // выбор оценки недоступен, пока не выбран вид тестирования
+    // grade select is disabled until test_type not selected
     const [isGradeSelectDisabled, setIsGradeSelectDisabled] = useState(true);
 
+    // test_type select handler
     const handleTestTypeOption = (selection: MyOption | null) => {
         if (selection) {
             console.log(selection.value);
             setTestTypeId(selection.value);
 
+            // make custom options array to prevent user's input varioation of grade value 
             let a: any[] = [];
             switch (selection.label) {
                 case 'Экзамен':
@@ -53,6 +60,7 @@ export default function StudentGradeCreate() {
                     break;
             }
             setGrades(a);
+            // enable grade select component
             setIsGradeSelectDisabled(false);
 
         }
@@ -80,6 +88,7 @@ export default function StudentGradeCreate() {
     };
 
     // useEffect to async call for data
+    // here we will collect data from api to construct options for select (dropdowns)
     useEffect(() => {
         async function getDisciplinesAsync() {
             const result = await RequestHelper.getTableDataWithRelations('discipline', 'curator');
@@ -87,28 +96,29 @@ export default function StudentGradeCreate() {
             console.log(result);
             let a: any[] = [];
             result.forEach((res: { name: any; objectId: any; curator: { last_name: any; first_name: any; other_name: any; } }) => {
+                // combine last_name, first_name and other_name to show short form (i.e. Brown D.E.)
                 let professorShortName: string = res.curator ? (' - ' + res.curator.last_name + (res.curator.first_name ? ' ' + res.curator.first_name.charAt(0).concat('.') + (res.curator.other_name ? res.curator.other_name.charAt(0).concat('.') : '') : '')) : '';
+                // combine discipline name and professor's name short form
                 let disciplineName: string = res.name + professorShortName;
                 a.push({ label: disciplineName, value: res.objectId });
             });
             console.log(a);
             setDisciplines(a);
-            // console.log(result);
-            // console.log(professors);
         }
+        // get data from student table
         async function getStudentsAsync() {
             const result = await RequestHelper.getTableData('student');
             let a: any[] = [];
             result.forEach((res: { last_name: any; first_name: any; other_name: any; objectId: any; }) => {
+                // get student full name short form (i.e. Brown D.E.)
                 let shortName: string = res.last_name + (res.first_name ? ' ' + res.first_name.charAt(0).concat('.') + (res.other_name ? res.other_name.charAt(0).concat('.') : '') : '');
 
                 a.push({ label: shortName, value: res.objectId });
             });
             console.log(a);
             setStudents(a);
-            // console.log(result);
-            // console.log(professors);
         }
+        // get data from test_type table
         async function getTestTypesAsync() {
             const result = await RequestHelper.getTableData('test_type');
             let a: any[] = [];
@@ -117,8 +127,6 @@ export default function StudentGradeCreate() {
             });
             console.log(a);
             setTestTypes(a);
-            // console.log(result);
-            // console.log(professors);
         }
         getDisciplinesAsync();
         getStudentsAsync();
@@ -128,23 +136,27 @@ export default function StudentGradeCreate() {
 
     const newStudentGrade = () => {
         setGrade("");
+        // TODO: here must be some data format (in create may use as is, but in edit it will be something else..)
         setGradeReceiptDate("");
+        // set submit with false and show user form
         setSubmitted(false);
     }
 
     const postData = () => {
+        // set submit with true and show user some notice
         setSubmitted(true);
-        console.log(grade);
-        console.log(grade_receipt_date);
-        let rec_id = '';
-        Application.createTablesObjects({ student_grade: [{ "grade": grade, "grade_receipt_date": grade_receipt_date }] }).then(
+        // save rec_id to use it when save relations
+        let recId: string = '';
+        //save main object (student_grade)
+        Application.createTablesObjects({ student_grade: [{ "grade": grade, "grade_receipt_date": gradeReceiptDate }] }).then(
             (response: any) => {
                 setSubmitted(true);
                 console.log(response);
-                rec_id = response.student_grade[0];
-                console.log(rec_id);
+                // get record_id
+                recId = response.student_grade[0];
+                console.log(recId);
 
-                let url = 'student_grade/' + rec_id.toString() + '/student';
+                let url: string = 'student_grade/' + recId.toString() + '/student';
                 console.log(url);
                 Application.createTablesObjectsRelations({ [url]: studentId }).then(
                     (response: any) => {
@@ -154,7 +166,7 @@ export default function StudentGradeCreate() {
                         console.log(e);
                     });
 
-                url = 'student_grade/' + rec_id.toString() + '/test_type';
+                url = 'student_grade/' + recId.toString() + '/test_type';
                 console.log(url);
                 Application.createTablesObjectsRelations({ [url]: testTypeId }).then(
                     (response: any) => {
@@ -164,7 +176,7 @@ export default function StudentGradeCreate() {
                         console.log(e);
                     });
 
-                url = 'student_grade/' + rec_id.toString() + '/discipline';
+                url = 'student_grade/' + recId.toString() + '/discipline';
                 console.log(url);
                 Application.createTablesObjectsRelations({ [url]: disciplineId }).then(
                     (response: any) => {
@@ -207,7 +219,7 @@ export default function StudentGradeCreate() {
                             <div className="row mt-2">
                                 <div className="col-6">
                                     <label htmlFor="test_type">Вид тестирования</label>
-                                    <Select id="test_type" options={test_types} onChange={handleTestTypeOption} placeholder="Выберите вид тестирования" />
+                                    <Select id="test_type" options={testTypes} onChange={handleTestTypeOption} placeholder="Выберите вид тестирования" />
                                 </div>
                                 <div className="form-group col-6">
                                     <label htmlFor="grade">Оценка</label>
@@ -224,7 +236,7 @@ export default function StudentGradeCreate() {
                                         className="form-control"
                                         id="grade_receipt_date"
                                         required
-                                        value={grade_receipt_date}
+                                        value={gradeReceiptDate}
                                         onChange={(e) => setGradeReceiptDate(e.target.value)}
                                         name="grade_receipt_date"
                                     />

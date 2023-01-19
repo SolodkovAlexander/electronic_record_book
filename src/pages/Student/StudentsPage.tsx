@@ -34,6 +34,7 @@ export const StudentsPage = () => {
   }, []);
 
 
+  // remove student by id
   const deleteStudent = (id: string) => {
     async function deleteCurrentProfessorAsync() {
         console.log(id);
@@ -69,7 +70,7 @@ export const StudentsPage = () => {
     console.log(result);
   }
 
-  // useEffect to async call for data
+  // useEffect to async call for student data
   useEffect(() => {
     getStudentAsync();
   }, []);

@@ -5,17 +5,15 @@ import Select, { OnChangeValue } from 'react-select';
 import { Application } from '../../Application';
 import { RequestHelper } from '../../helpers/RequestHelper';
 
-
-// define your option type
 type MyOption = { label: string, value: string }
 
 export default function ProfessorEdit() {
     const { id } = useParams();
 
-    const [first_name, setFirstName] = useState('');
-    const [last_name, setLastName] = useState('');
-    const [other_name, setOtherName] = useState('');
-    const [academic_degree, setAcademicDegree] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [otherName, setOtherName] = useState('');
+    const [academicDegree, setAcademicDegree] = useState('');
 
     const [submitted, setSubmitted] = useState(false);
 
@@ -46,7 +44,7 @@ export default function ProfessorEdit() {
         let rec_id = '';
         let update_student_group_url = '';
         if (id) {
-            Application.updateTableObjectByObjectId('professor', id.toString(), { 'first_name': first_name, 'last_name': last_name, 'other_name': other_name, 'academic_degree': academic_degree }, false).then(
+            Application.updateTableObjectByObjectId('professor', id.toString(), { 'first_name': firstName, 'last_name': lastName, 'other_name': otherName, 'academic_degree': academicDegree }, false).then(
                 (response: any) => {
                     setSubmitted(true);
                     console.log(response);
@@ -76,7 +74,7 @@ export default function ProfessorEdit() {
                                 className="form-control"
                                 id="last_name"
                                 required
-                                value={last_name}
+                                value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 name="last_name"
                             />
@@ -89,7 +87,7 @@ export default function ProfessorEdit() {
                                 className="form-control"
                                 id="first_name"
                                 required
-                                value={first_name}
+                                value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 name="first_name"
                             />
@@ -102,7 +100,7 @@ export default function ProfessorEdit() {
                                 className="form-control"
                                 id="other_name"
                                 required
-                                value={other_name}
+                                value={otherName}
                                 onChange={(e) => setOtherName(e.target.value)}
                                 name="other_name"
                             />
@@ -116,7 +114,7 @@ export default function ProfessorEdit() {
                             className="form-control"
                             id="academic_degree"
                             required
-                            value={academic_degree}
+                            value={academicDegree}
                             onChange={(e) => setAcademicDegree(e.target.value)}
                             name="academic_degree"
                         />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
+import PhoneInput from "react-phone-input-2";
 
 import Select, { OnChangeValue } from 'react-select';
 import { Application } from '../../Application';
@@ -11,9 +12,9 @@ import { RequestHelper } from '../../helpers/RequestHelper';
 type MyOption = { label: string, value: string }
 
 export default function StudentCreate() {
-  const [first_name, setFirstName] = useState('');
-  const [last_name, setLastName] = useState('');
-  const [other_name, setOtherName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [otherName, setOtherName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
 
@@ -59,7 +60,7 @@ export default function StudentCreate() {
     setSubmitted(true);
 
     let rec_id = '';
-    Application.createTablesObjects({ student: [{ 'first_name': first_name, 'last_name': last_name, 'other_name': other_name, 'phone': phone, 'email': email }] }).then(
+    Application.createTablesObjects({ student: [{ 'first_name': firstName, 'last_name': lastName, 'other_name': otherName, 'phone': phone, 'email': email }] }).then(
       (response: any) => {
         setSubmitted(true);
         console.log(response);
@@ -104,7 +105,7 @@ export default function StudentCreate() {
                     className="form-control"
                     id="last_name"
                     required
-                    value={last_name}
+                    value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     name="last_name"
                   />
@@ -117,7 +118,7 @@ export default function StudentCreate() {
                     className="form-control"
                     id="first_name"
                     required
-                    value={first_name}
+                    value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     name="first_name"
                   />
@@ -130,7 +131,7 @@ export default function StudentCreate() {
                     className="form-control"
                     id="other_name"
                     required
-                    value={other_name}
+                    value={otherName}
                     onChange={(e) => setOtherName(e.target.value)}
                     name="other_name"
                   />
@@ -139,15 +140,12 @@ export default function StudentCreate() {
 
               <div className="row">
                 <div className="form-group col-5">
-                  <label htmlFor="phone">Телефон</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="phone"
-                    required
+                  <PhoneInput
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    name="phone"
+                    onChange={(val) => setPhone(val)}
+                    country={"ru"}
+                    disableDropdown={true}
+                    specialLabel={"Телефон"}
                   />
                 </div>
 
