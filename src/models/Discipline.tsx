@@ -1,12 +1,12 @@
-export default class Group {
+export default class Discipline {
   name: string;
   description: string;
-  
+
 
   constructor(name: string, description: string) {
     this.name = name;
     this.description = description;
-    
+
   }
 
   rowDataGetter = function (params: any) {
@@ -14,6 +14,6 @@ export default class Group {
   };
   // return model fields to render table
   static describe(): any {
-    return [{ field: 'name', headerName: 'Наименование' }, {field: 'description', headerName: 'Описание' }, {field: 'curator.last_name', headerName: 'Тьютор'} ];
+    return [{ field: 'name', headerName: 'Наименование дисциплины' }, { field: 'description', headerName: 'Описание' }, { field: 'curator.last_name', headerName: 'Ответственный преподаватель' }];
   }
 }

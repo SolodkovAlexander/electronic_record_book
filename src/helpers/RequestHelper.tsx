@@ -88,6 +88,86 @@ export class RequestHelper {
 
     return doRequestResult;
   }
+
+      /**
+ * Fetch all data from table with tableName.
+ * @param tableName Tables name.
+ * @returns data set.
+ */
+      public static async getTableDataObject(objectId: string, tableName: string): Promise<any> {
+        if (!tableName) {
+          return false;
+        }
+    
+        let doRequestResult: any = await RequestHelper.doRequest({
+          params: {
+            url: `${taskRequestUrls.getTableData}/${tableName}/${objectId}`,
+            method: "get",
+            headers: {
+              "auth-key": requestSettings.developerInfo["auth-key"]
+            }
+          } as IRequestParams
+        } as IParamsApplicationDoRequest);
+        if (!doRequestResult) {
+          return null;
+        }
+    
+        return doRequestResult;
+      }  
+  
+
+    /**
+ * Fetch all data from table with tableName.
+ * @param tableName Tables name.
+ * @returns data set.
+ */
+    public static async getTableDataObjectWithRelations(objectId: string, tableName: string, relationName: string): Promise<any> {
+      if (!tableName) {
+        return false;
+      }
+  
+      let doRequestResult: any = await RequestHelper.doRequest({
+        params: {
+          url: `${taskRequestUrls.getTableData}/${tableName}/${objectId}?loadRelations=${relationName}`,
+          method: "get",
+          headers: {
+            "auth-key": requestSettings.developerInfo["auth-key"]
+          }
+        } as IRequestParams
+      } as IParamsApplicationDoRequest);
+      if (!doRequestResult) {
+        return null;
+      }
+  
+      return doRequestResult;
+    }  
+  
+
+  /**
+ * Fetch all data from table with tableName.
+ * @param tableName Tables name.
+ * @returns data set.
+ */
+  public static async getTableDataWithRelations(tableName: string, relationName: string): Promise<any> {
+    if (!tableName) {
+      return false;
+    }
+
+    let doRequestResult: any = await RequestHelper.doRequest({
+      params: {
+        url: `${taskRequestUrls.getTableData}/${tableName}?loadRelations=${relationName}`,
+        method: "get",
+        headers: {
+          "auth-key": requestSettings.developerInfo["auth-key"]
+        }
+      } as IRequestParams
+    } as IParamsApplicationDoRequest);
+    if (!doRequestResult) {
+      return null;
+    }
+
+    return doRequestResult;
+  }  
 //   /**
 //  * Create new objects in tables.
 //  * @param tablesObjectsInfo Tables objects info.
